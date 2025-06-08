@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>蔡秀吉 | 互動式個人網站</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- 
+    Chosen Palette: Warm Neutrals - A calm and professional base of whites and grays, with a sophisticated teal for accents and a dark slate for text.
+    Application Structure Plan: A thematic, single-page portfolio. The structure is designed for non-linear exploration, allowing users to dive into specific facets of Tsai's life (Journey, Tech, Innovation, etc.) via a sticky navigation bar. An interactive timeline is used for his personal story to make it engaging. Card-based layouts for projects allow for clean presentation, with modals providing deeper details on demand. This architecture was chosen to transform a dense, multi-page document into a digestible, user-driven experience that highlights his multi-faceted identity.
+    Visualization & Content Choices: 
+    - Personal Story (Pages 12-15): Goal: Inform/Engage -> Viz: Interactive horizontal timeline (HTML/CSS/JS). Interaction: Click nodes to open modals with details. Justification: More engaging than a wall of text, visualizes his journey of resilience.
+    - LGBTQ+ Attitude Study (Page 29): Goal: Compare/Analyze -> Viz: Grouped Bar Chart (Chart.js). Interaction: Buttons to filter data. Justification: Makes complex data from the table immediately comparable and understandable.
+    - Skills Overview: Goal: Inform/Organize -> Viz: Radar Chart (Chart.js). Interaction: Hover tooltips. Justification: Provides a quick, holistic visual summary of his diverse, cross-disciplinary skills.
+    - Projects (various pages): Goal: Inform/Showcase -> Viz: Grid of cards (HTML/Tailwind). Interaction: Click to open modals with images and descriptions. Justification: Organizes a large number of projects cleanly.
+    CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    -->
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+            color: #334155; /* slate-700 */
+        }
+        .chart-container {
+            position: relative;
+            height: 400px;
+            width: 100%;
+            max-width: 800px;
+            margin: auto;
+        }
+        .nav-link {
+            transition: color 0.3s, border-color 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #0d9488; /* teal-600 */
+            border-bottom-color: #0d9488;
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 2rem;
+            padding-left: 2.5rem;
+        }
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0.5rem;
+            top: 0.5rem;
+            width: 2px;
+            height: 100%;
+            background-color: #cbd5e1; /* slate-300 */
+        }
+        .timeline-dot {
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            height: 1.25rem;
+            width: 1.25rem;
+            border-radius: 9999px;
+            background-color: #f8fafc;
+            border: 3px solid #0d9488; /* teal-600 */
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .timeline-dot:hover {
+            transform: scale(1.2);
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 90%;
+            width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.95);
+            transition: transform 0.3s;
+        }
+         .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700">
+
+    <header id="header" class="bg-white/80 backdrop-blur-md sticky top-0 z-40 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <a href="#hero" class="text-xl font-bold text-slate-800">蔡秀吉</a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#journey" class="nav-link px-3 py-2 text-sm font-medium text-slate-600 border-b-2 border-transparent">人生歷程</a>
+                        <a href="#tech" class="nav-link px-3 py-2 text-sm font-medium text-slate-600 border-b-2 border-transparent">技術與研究</a>
+                        <a href="#innovation" class="nav-link px-3 py-2 text-sm font-medium text-slate-600 border-b-2 border-transparent">社會創新</a>
+                        <a href="#arts" class="nav-link px-3 py-2 text-sm font-medium text-slate-600 border-b-2 border-transparent">多元才藝</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <section id="hero" class="text-center py-20">
+            <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAEgASADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1VZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/n6/9oADAMBAAIRAxEAPwD+/iiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigA//Z" alt="蔡秀吉個人照片" class="w-36 h-36 rounded-full mx-auto mb-6 ring-4 ring-teal-500/50">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">蔡秀吉</h1>
+            <p class="mt-4 text-lg md:text-xl text-teal-600 font-semibold">跨域創新者 | AI x 生醫 | 社會實踐家</p>
+            <p class="mt-6 max-w-3xl mx-auto text-slate-600">
+                我是一位充滿熱情的跨領域問題解決者，致力於運用前瞻科技解決真實世界的問題。成長於鄉村的經歷，驅使我不斷學習、勇於挑戰，並立志成為一座「搭橋者」，連結不同的知識領域，為社會創造更公平、更多元的價值。
+            </p>
+            <div class="mt-8 bg-teal-50 border-l-4 border-teal-500 text-teal-800 p-4 rounded-md max-w-2xl mx-auto">
+                <p class="font-bold">最高榮譽：2023 總統教育獎奮發向上獎</p>
+                <p class="text-sm mt-1">憑藉在逆境中展現的堅韌生命力，以及在學術、社會創新與跨領域實踐上的卓越成就，獲此國家級殊榮。</p>
+            </div>
+        </section>
+
+        <section id="journey" class="py-16">
+            <h2 class="text-3xl font-bold text-center mb-12 text-slate-900">人生歷程：一段逆境求生的旅程</h2>
+             <div class="max-w-4xl mx-auto">
+                <p class="text-center text-slate-600 mb-12">
+                    從鄉村到頂尖大學，從夜市學徒到科技先鋒，我的人生是一連串的挑戰與蛻變。這裡的每一個節點，都代表著一段克服困難、汲取力量的故事。點擊時間點，探索我如何將逆境化為養分，長成今日的模樣。
+                </p>
+                <div class="relative">
+                    <div class="timeline-item" data-modal="journey-1">
+                        <div class="timeline-dot"></div>
+                        <h3 class="text-lg font-semibold text-slate-800">鄉村童年與夜市磨練</h3>
+                        <p class="text-sm text-slate-500">12歲</p>
+                        <p class="mt-2 text-slate-600">出身中低收入家庭，在夜市當叫賣學徒，習得一口流利的台語與社會交際能力。</p>
+                    </div>
+                    <div class="timeline-item" data-modal="journey-2">
+                        <div class="timeline-dot"></div>
+                        <h3 class="text-lg font-semibold text-slate-800">家庭變故與從軍抉擇</h3>
+                        <p class="text-sm text-slate-500">高中畢業</p>
+                        <p class="mt-2 text-slate-600">父親罹癌、家中經濟遭逢重擊。為分攤家計，休學並志願投身海軍陸戰隊。</p>
+                    </div>
+                    <div class="timeline-item" data-modal="journey-3">
+                        <div class="timeline-dot"></div>
+                        <h3 class="text-lg font-semibold text-slate-800">自我探索與挑戰</h3>
+                        <p class="text-sm text-slate-500">19歲</p>
+                        <p class="mt-2 text-slate-600">離開原生家庭，開始獨立生活。這是一段深刻的自我探索時期，我學習面對並克服了重大的個人挑戰，這段經歷塑造了我堅韌的性格。</p>
+                    </div>
+                     <div class="timeline-item" data-modal="journey-4">
+                        <div class="timeline-dot"></div>
+                        <h3 class="text-lg font-semibold text-slate-800">重返校園與科技啟蒙</h3>
+                         <p class="text-sm text-slate-500">大學期間</p>
+                        <p class="mt-2 text-slate-600">重拾書本，進入陽明交大，貪婪地學習跨領域知識，並在資訊科技領域找到天賦。</p>
+                    </div>
+                     <div class="timeline-item" data-modal="journey-5">
+                        <div class="timeline-dot"></div>
+                        <h3 class="text-lg font-semibold text-slate-800">國際視野與展望</h3>
+                         <p class="text-sm text-slate-500">現在</p>
+                        <p class="mt-2 text-slate-600">榮獲教育部獎學金，將赴捷克查理大學與捷克理工大學進行醫學與電信工程的訪問研究。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tech" class="py-16 bg-white rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold text-center mb-12 text-slate-900">技術與研究：在 5G O-RAN 的最前線</h2>
+             <p class="text-center text-slate-600 max-w-4xl mx-auto mb-12">
+                我專注於推動 5G 開放式無線接入網 (Open RAN) 技術，以打破傳統電信市場壟斷，促進網路基礎設施的普及。從學術研究到產業實踐，再到社群倡議，我全方位地投入這個足以改變未來通訊的領域。
+            </p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="bg-slate-50 p-6 rounded-md border border-slate-200">
+                    <h3 class="font-bold text-lg text-teal-700">產業實踐</h3>
+                    <p class="mt-2 text-sm">於**廣達電腦**擔任 O-RAN 研究實習生，參與商用級解決方案的研發。</p>
+                </div>
+                <div class="bg-slate-50 p-6 rounded-md border border-slate-200">
+                    <h3 class="font-bold text-lg text-teal-700">學術研究</h3>
+                    <p class="mt-2 text-sm">擔任**國科會**計畫研究助理，參與 O-RAN 核心技術開發、測試與雲原生 (Docker/K8s) 部署。</p>
+                </div>
+                <div class="bg-slate-50 p-6 rounded-md border border-slate-200">
+                    <h3 class="font-bold text-lg text-teal-700">技術貢獻</h3>
+                    <p class="mt-2 text-sm">製作的 5G O-RAN 科普教材，獲**經濟部工業局**採納，成為官方課程教材。</p>
+                </div>
+                 <div class="bg-slate-50 p-6 rounded-md border border-slate-200">
+                    <h3 class="font-bold text-lg text-teal-700">社群影響力</h3>
+                    <p class="mt-2 text-sm">在 **SITCON、COSCUP** 等台灣指標性技術年會擔任講者，是推廣 O-RAN 技術的先驅之一。</p>
+                </div>
+                <div class="bg-slate-50 p-6 rounded-md border border-slate-200">
+                    <h3 class="font-bold text-lg text-teal-700">創新應用</h3>
+                    <p class="mt-2 text-sm">以「O-RAN 專網實現醫院智慧人流分配」專案，入選**經濟部工業局通訊大賽決賽**。</p>
+                </div>
+                 <div class="bg-slate-50 p-6 rounded-md border border-slate-200">
+                    <h3 class="font-bold text-lg text-teal-700">跨域整合</h3>
+                    <p class="mt-2 text-sm">發表「O-RAN 結合低軌衛星通訊」論文，獲**臺灣海洋治理國際研討會論文獎**。</p>
+                </div>
+            </div>
+             <div class="mt-16">
+                <h3 class="text-2xl font-bold text-center mb-8 text-slate-800">多元技能光譜</h3>
+                <div class="chart-container h-96">
+                    <canvas id="skillsRadarChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="innovation" class="py-16">
+            <h2 class="text-3xl font-bold text-center mb-12 text-slate-900">社會創新：用科技回應社會需求</h2>
+             <p class="text-center text-slate-600 max-w-4xl mx-auto mb-12">
+                我相信科技的最終目的是服務人群。我的成長背景讓我對社會議題特別敏感，也因此發起了數個屢獲殊榮的社會創新專案，希望能用自己的力量，為這片土地帶來正向的改變。
+            </p>
+            <div class="space-y-8">
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col md:flex-row items-center gap-6">
+                    <img src="https://placehold.co/100x100/14b8a6/ffffff?text=語" alt="語您童行" class="w-24 h-24 rounded-lg object-cover">
+                    <div>
+                        <h3 class="font-bold text-xl text-slate-800">「語您童行」本土語言傳承計畫</h3>
+                        <p class="mt-2 text-slate-600">結合科技與創意，製作台語、客語科普內容，挑戰語言的刻板印象。此計畫榮獲**教育部「青年全球行動計畫卓越行動獎」**，並獲公視新聞台等媒體專訪報導。</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col md:flex-row items-center gap-6">
+                    <img src="https://placehold.co/100x100/38bdf8/ffffff?text=教" alt="偏鄉教育" class="w-24 h-24 rounded-lg object-cover">
+                    <div>
+                        <h3 class="font-bold text-xl text-slate-800">偏鄉教育資源整合平台</h3>
+                        <p class="mt-2 text-slate-600">為解決城鄉教育資源不平等問題，於 g0v 社群發起專案，打造一站式資源平台。此專案榮獲**零時小學校 Demo Day 競賽前五名**，並代表陽明交大參加 **Google 全球 Solution Challenge**。</p>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col md:flex-row items-center gap-6">
+                    <img src="https://placehold.co/100x100/a78bfa/ffffff?text=藝" alt="藝童教育" class="w-24 h-24 rounded-lg object-cover">
+                    <div>
+                        <h3 class="font-bold text-xl text-slate-800">「藝童教育」社創團隊</h3>
+                        <p class="mt-2 text-slate-600">共同創辦團隊，為弱勢家庭背景的學童提供線上藝術與文化課程，獲**陽明交大創新創業競賽**肯定與創業獎金支持。</p>
+                    </div>
+                </div>
+            </div>
+             <div class="mt-16 bg-white p-8 rounded-lg shadow-lg">
+                <h3 class="text-2xl font-bold text-center mb-2 text-slate-800">教育社會學研究</h3>
+                 <p class="text-center text-slate-600 max-w-3xl mx-auto mb-8">
+                     除了實踐，我也透過學術研究探索社會議題。這份關於大學生對同志態度的研究，揭示了性別在同溫層中的微妙差異，並獲得校內通識課程專題競賽特優。
+                </p>
+                <div class="chart-container">
+                    <canvas id="attitudeChart"></canvas>
+                </div>
+                 <div class="text-center mt-4">
+                    <button onclick="updateAttitudeChart('all')" class="bg-teal-500 text-white px-4 py-2 rounded-md text-sm hover:bg-teal-600 transition">全體</button>
+                    <button onclick="updateAttitudeChart('male')" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm hover:bg-slate-300 transition ml-2">僅男性</button>
+                    <button onclick="updateAttitudeChart('female')" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm hover:bg-slate-300 transition ml-2">僅女性</button>
+                </div>
+            </div>
+        </section>
+        
+        <section id="arts" class="py-16">
+            <h2 class="text-3xl font-bold text-center mb-12 text-slate-900">多元才藝：當科技人走上舞台</h2>
+             <p class="text-center text-slate-600 max-w-4xl mx-auto mb-12">
+                我相信，豐富的生命體驗能激發更多元的創造力。舞台表演是我探索自我、連結人群的另一種方式。從傳統戲曲到現代喜劇，我享受在不同角色間切換的樂趣。
+            </p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-center">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl mb-2">🎭</h3>
+                    <h4 class="font-bold text-lg text-slate-800">台灣唸歌 (歌仔戲)</h4>
+                    <p class="text-sm mt-2 text-slate-600">加入蘭陽戲劇團，擔綱《天公疼憨人》丑角主角。更從全國近三千名參賽者中脫穎而出，晉級**全國歌仔戲比賽複賽**。</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl mb-2">🎤</h3>
+                    <h4 class="font-bold text-lg text-slate-800">脫口秀 (單口喜劇)</h4>
+                    <p class="text-sm mt-2 text-slate-600">以《大一上被二一，然後呢？》為題，用詼諧反諷的段子，分享城鄉差距與個人生命經驗，獲得滿堂彩。</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl mb-2">📰</h3>
+                    <h4 class="font-bold text-lg text-slate-800">台語播報與配音</h4>
+                    <p class="text-sm mt-2 text-slate-600">非本科系挑戰**台北扶輪盃台語新聞播報競賽**並獲優勝。同時也參與霹靂布袋戲培訓，以多變聲線進行配音。</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center text-slate-400">
+            <p>&copy; 2024 Hsiu-Chi (Ting-Yi) Tsai. All Rights Reserved.</p>
+            <p class="text-sm mt-2">此頁面由 AI 輔助，根據提供之資料生成。</p>
+        </div>
+    </footer>
+
+    <div id="modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modal-title" class="text-2xl font-bold mb-4 text-slate-900"></h3>
+            <div id="modal-body" class="text-slate-600 space-y-4"></div>
+            <button id="modal-close" class="mt-6 bg-teal-500 text-white px-4 py-2 rounded-md hover:bg-teal-600 transition">關閉</button>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        
+        const modalData = {
+            'journey-1': {
+                title: '鄉村童年與夜市磨練',
+                body: `<p>在有記憶以來，家中就是中低收入戶。12歲時，我便步入社會，在夜市擔任叫賣學徒。這段經歷不僅讓我習得一口流利的台語，更教會我社會交際的應對進退與舌燦蓮花的功夫，成為我日後與人溝通的重要資產。</p><img src="https://placehold.co/400x250/e0f2f1/0f766e?text=夜市歲月" class="mt-4 rounded-lg w-full">`
+            },
+            'journey-2': {
+                title: '家庭變故與從軍抉擇',
+                body: '<p>高中畢業後，父親被診斷出鼻咽癌等多重癌症，家中修車廠也因地主停租而遭強拆，經濟頓時陷入絕境。看著同學們對大學生活充滿憧憬，我選擇了另一條路——暫緩升學，志願加入海軍陸戰隊，希望以每月四萬元的薪水，為家庭撐起一片天。</p>'
+            },
+            'journey-3': {
+                title: '自我探索與挑戰',
+                body: '<p>19歲那年，我離開原生家庭，開始獨立生活。這是一段深刻的自我探索時期，我學習面對並克服了重大的個人挑戰，這段經歷塑造了我堅韌的性格，也成為我日後面對困難時，永不放棄的力量來源。</p><img src="https://placehold.co/400x250/e0e7ff/4338ca?text=自我成長" class="mt-4 rounded-lg w-full">'
+            },
+            'journey-4': {
+                title: '重返校園與科技啟蒙',
+                body: '<p>放棄了軍旅生涯，我選擇重返校園，進入陽明交通大學。在這裡，我像海綿一樣貪婪地吸收各種跨領域的知識。雖然課業繁重，還需打工維持生計，但我憑藉著高度的專注力，在資訊科技領域找到了無與倫比的熱情與天賦，開啟了我的科技之路。</p>'
+            },
+            'journey-5': {
+                title: '國際視野與展望',
+                body: '<p>我的努力沒有白費。憑藉著在學術與社會創新領域的積累，我成功申請到教育部的公費獎學金，即將啟程前往捷克，在查理大學醫學院與捷克理工大學電信工程系進行為期十個月的訪問研究。這是我第一次踏出國門，也是我將台灣經驗與國際連結的重要一步。我相信，這段經歷將為我的未來帶來更廣闊的視野。</p><img src="https://placehold.co/400x250/f0f9ff/0284c7?text=邁向國際" class="mt-4 rounded-lg w-full">'
+            },
+        };
+
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+        const modalClose = document.getElementById('modal-close');
+
+        document.querySelectorAll('[data-modal]').forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                const modalId = trigger.dataset.modal;
+                const data = modalData[modalId];
+                if (data) {
+                    modalTitle.textContent = data.title;
+                    modalBody.innerHTML = data.body;
+                    modal.classList.add('active');
+                }
+            });
+        });
+
+        const closeModal = () => {
+            modal.classList.remove('active');
+        };
+
+        modalClose.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('section');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.3
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(link => {
+                        link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        const attitudeChartData = {
+            labels: ['友情接受度', '愛情接受度', '同情程度'],
+            all: {
+                male: [3.20, 2.85, 3.35],
+                female: [3.73, 3.56, 3.74]
+            },
+            male: {
+                male: [3.20, 2.85, 3.35], 
+                female: [3.49, 3.24, 3.46] 
+            },
+            female: {
+                male: [3.73, 3.56, 3.74], 
+                female: [3.74, 3.63, 3.79] 
+            }
+        };
+
+        let attitudeChart;
+        const ctxAttitude = document.getElementById('attitudeChart').getContext('2d');
+        
+        window.updateAttitudeChart = (filter) => {
+            if(attitudeChart) {
+                attitudeChart.destroy();
+            }
+
+            let datasets;
+            let titleText = '大學生對同志態度之調查研究 (分數越高代表越正向)';
+
+            if (filter === 'all') {
+                 datasets = [
+                    { label: '男性對男同志的平均態度', data: attitudeChartData.all.male, backgroundColor: 'rgba(59, 130, 246, 0.7)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 1 },
+                    { label: '女性對男同志的平均態度', data: attitudeChartData.all.female, backgroundColor: 'rgba(236, 72, 153, 0.7)', borderColor: 'rgba(236, 72, 153, 1)', borderWidth: 1 }
+                ];
+                titleText = '全體學生對同志態度比較';
+            } else if (filter === 'male') {
+                datasets = [
+                    { label: '男性對男同志態度', data: attitudeChartData.male.male, backgroundColor: 'rgba(59, 130, 246, 0.7)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 1 },
+                    { label: '男性對女同志態度', data: attitudeChartData.male.female, backgroundColor: 'rgba(236, 72, 153, 0.7)', borderColor: 'rgba(236, 72, 153, 1)', borderWidth: 1 }
+                ];
+                titleText = '男性受訪者對不同性別同志之態度比較';
+            } else { // female
+                 datasets = [
+                    { label: '女性對男同志態度', data: attitudeChartData.female.male, backgroundColor: 'rgba(59, 130, 246, 0.7)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 1 },
+                    { label: '女性對女同志態度', data: attitudeChartData.female.female, backgroundColor: 'rgba(236, 72, 153, 0.7)', borderColor: 'rgba(236, 72, 153, 1)', borderWidth: 1 }
+                ];
+                titleText = '女性受訪者對不同性別同志之態度比較';
+            }
+
+            attitudeChart = new Chart(ctxAttitude, {
+                type: 'bar',
+                data: {
+                    labels: attitudeChartData.labels,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { display: true, text: titleText, font: {size: 16} },
+                        tooltip: { mode: 'index', intersect: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, max: 5, grid: { color: '#e5e7eb' } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        };
+
+        updateAttitudeChart('all');
+
+
+        const ctxRadar = document.getElementById('skillsRadarChart').getContext('2d');
+        new Chart(ctxRadar, {
+            type: 'radar',
+            data: {
+                labels: ['技術研發', '社會創新', '領導力', '溝通表達', '藝術才華', '學術研究'],
+                datasets: [{
+                    label: '蔡秀吉的技能分佈',
+                    data: [9, 9, 8, 10, 7, 8],
+                    fill: true,
+                    backgroundColor: 'rgba(13, 148, 136, 0.2)',
+                    borderColor: 'rgb(13, 148, 136)',
+                    pointBackgroundColor: 'rgb(13, 148, 136)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(13, 148, 136)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                elements: {
+                    line: {
+                        borderWidth: 3
+                    }
+                },
+                scales: {
+                    r: {
+                        angleLines: { color: '#cbd5e1' },
+                        grid: { color: '#e5e7eb' },
+                        pointLabels: { font: { size: 14 }, color: '#334155' },
+                        ticks: {
+                           backdropColor: 'transparent',
+                           stepSize: 2
+                        },
+                        min: 0,
+                        max: 10
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
