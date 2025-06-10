@@ -3,366 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>申根簽證數學小老師：台灣學生專用</title>
+    <title>./Hsiu-Chi_Tsai</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Calm Neutrals with Clear Accents -->
-    <!-- Application Structure Plan: The application is designed as a scenario-based interactive guide. It starts with a high-level explanation of the two distinct travel rights (visa-free vs. D-visa). The core of the app is a set of interactive tabs allowing users to select their specific situation (e.g., "Travel before visa starts"). This immediately provides tailored information, which is more effective than reading a long report. It then includes an interactive calculator with a Chart.js visualization to make the abstract 90/180 rule tangible. Finally, it presents critical, non-negotiable advice (contact officials, document checklist) in a highly visible format. This structure guides the user from understanding concepts to applying them and taking necessary action, directly addressing the source report's complexity in a user-friendly, task-oriented way. -->
-    <!-- Visualization & Content Choices: 
-        - Core Concepts (Two Travel Rights): Goal: Inform/Distinguish. Method: Side-by-side HTML/Tailwind cards with Unicode icons (✈️, 🎓). Justification: Clear visual separation of the two key concepts.
-        - Main Scenarios: Goal: Organize/Navigate. Method: Interactive HTML tabs powered by JS. Justification: Allows users to self-select their context and receive focused, relevant information without being overwhelmed.
-        - 90/180 Rule Calculation: Goal: Explain a dynamic process. Method: Interactive date inputs with a Chart.js bar chart. Justification: Transforms the confusing "rolling window" rule into a personalized, visual calculation. Library: Chart.js (Canvas).
-        - Key Advice/Warnings: Goal: Inform/Warn. Method: Visually distinct callout cards (HTML/Tailwind) with icons (❗, �). Justification: Highlights the most critical, non-skippable information for user safety and compliance.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: #F8F7F4; /* Warm neutral background */
+            background-color: #0d1117;
+            color: #c9d1d9;
+            font-family: 'Fira Code', monospace;
         }
-        .tab-active {
-            background-color: #3B82F6; /* Accent blue */
-            color: white;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-        }
-        .tab-inactive {
-            background-color: #E5E7EB; /* Light gray */
-            color: #374151; /* Dark gray text */
-        }
-        .content-card {
-            background-color: #FFFFFF;
-            border: 1px solid #E5E7EB;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
-            transition: all 0.3s ease-in-out;
-        }
-        .chart-container {
-            position: relative;
+        .terminal {
             width: 100%;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 350px;
+            height: 100vh;
+            overflow-y: auto;
+            background: #010409;
+            border: 1px solid #30363d;
+            box-shadow: 0 0 20px rgba(0, 128, 255, 0.1);
+            cursor: text;
         }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 350px;
-            }
+        .prompt::before {
+            content: 'user@hctsai1006:~$';
+            color: #58a6ff; /* 藍色 */
+            margin-right: 0.75rem;
+        }
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2em;
+            background-color: #c9d1d9;
+            animation: blink 1s step-end infinite;
+            vertical-align: middle;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .command {
+            color: #79c0ff;
+        }
+        .output {
+            white-space: pre-wrap;
+            color: #a5d6ff;
+        }
+        .output-title {
+            color: #1f6feb;
+            font-weight: bold;
+        }
+        .link {
+            color: #58a6ff;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .link:hover {
+            color: #79c0ff;
+        }
+        #terminal-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #79c0ff;
+            width: 100%;
         }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="p-2 sm:p-4">
 
-    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-
-        <header class="text-center mb-10">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">申根簽證數學小老師</h1>
-            <p class="mt-2 text-lg text-gray-600">為台灣留學生解析複雜的停留天數規定</p>
-        </header>
-
-        <section class="mb-12">
-            <h2 class="text-2xl font-bold text-center mb-6">核心概念：您擁有兩種獨立的旅遊權利</h2>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="content-card">
-                    <h3 class="flex items-center text-xl font-bold mb-3">
-                        <span class="text-2xl mr-3">✈️</span> 台灣護照免簽權
-                    </h3>
-                    <p class="text-gray-700">這是您的基本權利。適用於您學生簽證生效「前」或到期「後」的純旅遊期間。</p>
-                    <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
-                        <p class="font-semibold text-blue-800">規則：任何180天內，最多停留 <span class="text-xl font-bold">90</span> 天。</p>
-                    </div>
-                </div>
-                <div class="content-card">
-                    <h3 class="flex items-center text-xl font-bold mb-3">
-                        <span class="text-2xl mr-3">🎓</span> 學生簽證/居留許可附加權
-                    </h3>
-                    <p class="text-gray-700">這是您留學期間的額外福利。用於從您的留學國前往「其他」申根國家旅遊。</p>
-                    <div class="mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
-                        <p class="font-semibold text-green-800">規則：任何180天內，在「其他申根國」最多停留 <span class="text-xl font-bold">90</span> 天。</p>
-                        <p class="text-sm text-green-700 mt-1">此天數獨立計算，且您在留學國的時間不算在內。</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="mb-12">
-            <h2 class="text-2xl font-bold text-center mb-6">情境模擬：點選您的情況</h2>
-            <div id="tabs" class="flex flex-wrap justify-center gap-3 mb-6">
-                <!-- Tabs will be inserted by JS -->
-            </div>
-            <div id="content" class="content-card min-h-[250px]">
-                <!-- Content will be inserted by JS -->
-            </div>
-        </section>
-
-        <section class="mb-12 content-card">
-            <h2 class="text-2xl font-bold text-center mb-2">停留天數計算機 (90/180天規則)</h2>
-            <p class="text-center text-gray-600 mb-6">用這個工具來規劃您的免簽旅遊行程。輸入您過去或計劃的每次出入境日期。</p>
-            <div id="calculator" class="space-y-4">
-                <div class="grid md:grid-cols-2 gap-4" id="date-entries">
-                    <div class="flex items-center gap-2">
-                        <label for="entry1" class="text-sm font-medium whitespace-nowrap">入境 1:</label>
-                        <input type="date" id="entry1" class="form-input w-full p-2 border rounded-md">
-                        <label for="exit1" class="text-sm font-medium whitespace-nowrap">出境 1:</label>
-                        <input type="date" id="exit1" class="form-input w-full p-2 border rounded-md">
-                    </div>
-                </div>
-                <div class="flex justify-center gap-4">
-                    <button id="add-entry-btn" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">增加一筆行程</button>
-                    <button id="calculate-btn" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">計算</button>
-                </div>
-            </div>
-            <div class="mt-6">
-                <div class="chart-container">
-                    <canvas id="stay-chart"></canvas>
-                </div>
-                <div id="calculation-result" class="text-center mt-4 font-semibold text-lg"></div>
-            </div>
-        </section>
-
-        <section>
-            <h2 class="text-2xl font-bold text-center mb-6">最重要的事：關鍵提醒</h2>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="content-card border-l-4 border-yellow-400">
-                    <h3 class="text-xl font-bold mb-3"><span class="mr-2">❗</span> 務必向官方確認</h3>
-                    <p class="text-gray-700">關於免簽和學生簽證身份的「轉換」，各國規定不同。這是最容易出錯的地方！</p>
-                    <ul class="list-disc list-inside mt-2 space-y-1 text-sm">
-                        <li><strong>簽證生效前/後旅遊：</strong>必須向您的<span class="font-bold">留學國使領館</span>或<span class="font-bold">當地移民局</span>確認是否需要出入境來轉換身份。</li>
-                        <li>不要擅自假設！問清楚才能避免非法停留。</li>
-                    </ul>
-                </div>
-                <div class="content-card border-l-4 border-blue-400">
-                    <h3 class="text-xl font-bold mb-3"><span class="mr-2">📄</span> 隨身攜帶文件</h3>
-                    <p class="text-gray-700">即使在申根區內移動，也可能遇到抽查。請務必備齊：</p>
-                    <ul class="list-disc list-inside mt-2 space-y-1 text-sm">
-                        <li>有效護照</li>
-                        <li>有效學生簽證 或 居留許可證</li>
-                        <li>財力證明</li>
-                        <li>旅遊醫療保險 (強烈建議)</li>
-                        <li>入學許可、住宿證明等</li>
-                    </ul>
-                </div>
-                <div class="content-card border-l-4 border-red-500">
-                    <h3 class="text-xl font-bold mb-3"><span class="mr-2">⚖️</span> 逾期停留後果嚴重</h3>
-                    <p class="text-gray-700">逾期停留會留下不良紀錄，影響未來簽證申請，並可能面臨：</p>
-                    <ul class="list-disc list-inside mt-2 space-y-1 text-sm">
-                        <li>罰款</li>
-                        <li>被驅逐出境</li>
-                        <li>被註記在申根資訊系統 (SIS)</li>
-                        <li>短期或長期禁止入境申根區</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <footer class="text-center text-gray-500 mt-12 text-sm">
-            <p>本工具為根據公開資訊整理的輔助指南，不能取代官方法律建議。</p>
-            <p>所有規定應以各國使領館、移民局等官方機構的最新解釋為準。</p>
-            <p class="mt-2">主要資料來源：<a href="https://hackmd.io/@thc1006/HJWiAGSmlg" target="_blank" class="text-blue-500 hover:underline">旅歐台灣學生注意事項 (HackMD) 蔡秀吉</a></p>
-        </footer>
+    <div id="terminal" class="terminal p-4 rounded-md">
+        <div id="terminal-content"></div>
+        <div class="flex items-center">
+            <div class="prompt"></div>
+            <input type="text" id="terminal-input" class="flex-1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+        </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const tabsContainer = document.getElementById('tabs');
-            const contentContainer = document.getElementById('content');
+        const terminal = document.getElementById('terminal');
+        const terminalContent = document.getElementById('terminal-content');
+        const terminalInput = document.getElementById('terminal-input');
+        
+        const commands = {
+            'help': `
+<span class="output-title">可用指令:</span>
+  <span class="command">whoami</span>         - 關於我
+  <span class="command">ls ./projects</span>    - 專案與社會創新
+  <span class="command">cat honors.md</span>    - 主要榮譽與肯定
+  <span class="command">./run_performance</span>- 跨域展演 (藝術 & 演說)
+  <span class="command">connect</span>          - 聯絡方式
+  <span class="command">clear</span>            - 清除畫面
+`,
+            'whoami': `
+<span class="output-title">hsiuchi_tsai (蔡秀吉 / 蔡廷羿)</span>
+--------------------------------------------------
+身份: AI研究者 / 社會創業家 / 前瞻科技轉譯者
+地點: 台灣，新竹
+學歷: 國立陽明交通大學 & 國立清華大學
+核心理念: 透過科技與行動，解決真實世界的問題。
+個人特質: 我的故事始於鄉村的泥土與夜市的喧囂，這份早熟的歷練，成為我所有行動的初衷。我相信教育與科技是翻轉生命最強大的力量。
+`,
+            'ls': `專案列表請輸入 <span class="command">ls ./projects</span>`,
+            'ls ./projects': `
+<span class="output-title">專案列表 (drwxr-xr-x):</span>
+<span class="command">語您童行/</span>       - [社會創新] 用台語、客語進行科學普及，獲教育部卓越行動獎。
+<span class="command">108課綱平台/</span>    - [教育科技] 針對城鄉資源不平等，為高中生打造開源升學平台。
+<span class="command">5G智慧醫療/</span>    - [前瞻應用] 以O-RAN專網優化醫院健檢流程，入圍經濟部5G競賽決賽。
+<span class="command">藝童教育/</span>       - [社會企業] 為弱勢及特殊需求學童提供線上才藝課程，獲創業競賽獎金。
+`,
+            'cat honors.md': `
+<span class="output-title"># 主要榮譽與肯定</span>
 
-            const scenarios = [
-                {
-                    title: '簽證生效前旅遊',
-                    content: `
-                        <h3 class="text-xl font-bold mb-3">情境：我想提早幾週到申根區玩，然後直接開始留學。</h3>
-                        <p class="mb-2"><strong>適用規則：</strong>台灣護照免簽權 (任何180天內，最多停留90天)。</p>
-                        <p class="mb-4">您提早旅遊的天數，會從這90天中扣除。</p>
-                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
-                            <h4 class="font-bold text-yellow-800">⚡️ 最關鍵的行動：</h4>
-                            <p class="text-yellow-700">您<strong>必須</strong>向您的<strong class="font-semibold">留學目的國駐台辦事處</strong>確認：結束免簽旅遊後，是否可以直接在申根區內等到簽證生效日，還是<strong class="font-semibold">必須先出境、再持學生簽證重新入境</strong>。各國規定不同，千萬不能自己猜！</p>
-                        </div>
-                    `
-                },
-                {
-                    title: '留學期間去別國玩',
-                    content: `
-                        <h3 class="text-xl font-bold mb-3">情境：我持有A國的學生簽證/居留證，想趁假期去B、C國玩。</h3>
-                        <p class="mb-2"><strong>適用規則：</strong>學生簽證/居留許可附加權 (任何180天內，在「其他」申根國最多停留90天)。</p>
-                        <p class="mb-4">這個90天是獨立計算的！您在A國（留學國）居住和學習的時間，完全<strong class="font-semibold">不</strong>會消耗這個額度。</p>
-                        <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
-                             <h4 class="font-bold text-green-800">💡 聰明規劃：</h4>
-                            <p class="text-green-700">這是您的專屬福利！只要您持有有效的簽證/居留證，就可以利用這個額度暢遊其他申根國家。記得分開記錄您在「其他」申根國的旅遊天數即可。</p>
-                        </div>
-                    `
-                },
-                {
-                    title: '學業結束後旅遊',
-                    content: `
-                        <h3 class="text-xl font-bold mb-3">情境：我畢業了，居留證也快到期了，想再多留一段時間旅遊。</h3>
-                        <p class="mb-2"><strong>適用規則：</strong>回歸台灣護照免簽權 (任何180天內，最多停留90天)。</p>
-                        <p class="mb-4">好消息是，您過去以學生身份停留的時間<strong class="font-semibold">不會</strong>被用來計算這個新的90天額度。您理論上擁有一個全新的90天。</p>
-                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
-                            <h4 class="font-bold text-yellow-800">⚡️ 最關鍵的行動：</h4>
-                            <p class="text-yellow-700">和簽證生效前一樣，您<strong>必須</strong>向您<strong class="font-semibold">原留學國的移民局</strong>確認：居留證到期後，是否可以直接轉換為免簽身份繼續停留，還是<strong class="font-semibold">必須先離開申根區、再以免簽身份重新入境</strong>。這是避免非法逾期停留的關鍵！</p>
-                        </div>
-                    `
-                }
-            ];
+- 2023 總統教育獎 - 奮發向上獎: 全國性最高榮譽，肯定其逆境奮鬥與社會服務精神。
+- 2023 捷克政府全額獎學金: 將以訪問學者身份赴查理大學與捷克理工大學進行為期10個月的研究。
+- 國科會大專生研究計畫: 獲補助主持「基於聯邦學習與O-RAN」之前瞻通訊研究。
+- 教育部青年署 卓越行動獎: 肯定「語您童行」計畫在社會創新與文化傳承上的貢獻。
+- 跨國企業與政府肯定: 研究教材獲經濟部採納，並獲微軟、Google等企業頒發獎項與認證。
+`,
+            './run_performance': `
+<span class="output-title">執行中... ./run_performance</span>
+在硬核的科技之外，我相信藝術與溝通的力量。
 
-            function renderTabs() {
-                tabsContainer.innerHTML = scenarios.map((s, i) => `
-                    <button class="tab-btn px-4 py-2 text-sm md:text-base rounded-md font-medium transition-all duration-200 ${i === 0 ? 'tab-active' : 'tab-inactive'}" data-index="${i}">
-                        ${s.title}
-                    </button>
-                `).join('');
-            }
+<span class="command">傳統戲曲</span>
+- 蘭陽戲劇團: 擔綱《天公疼憨人》一劇主角。
+- 全國歌仔戲比賽: 從近三千人中脫穎而出，晉級複賽。
 
-            function renderContent(index) {
-                contentContainer.innerHTML = scenarios[index].content;
-            }
+<span class="command">演說與展演</span>
+- SITCON/COSCUP: 於大型技術年會擔任講者，曾以「全台語」發表演說。
+- 單口喜劇: 以個人生命故事為本，進行脫口秀表演。
+- Podcast: 擔任新竹縣教育局青年播客代表，分享大學生活議題。
+`,
+            'connect': `
+<span class="output-title">聯絡方式:</span>
+  Email: <a href="mailto:thc1006@ieee.org" class="link">thc1006@ieee.org</a>
+  Phone: +886-966745188
+`,
+            'clear': ''
+        };
 
-            tabsContainer.addEventListener('click', (e) => {
-                if (e.target.classList.contains('tab-btn')) {
-                    const index = e.target.dataset.index;
-                    document.querySelectorAll('.tab-btn').forEach(btn => {
-                        btn.classList.remove('tab-active');
-                        btn.classList.add('tab-inactive');
-                    });
-                    e.target.classList.add('tab-active');
-                    e.target.classList.remove('tab-inactive');
-                    renderContent(index);
-                }
-            });
-            
-            renderTabs();
-            renderContent(0);
-
-            // Calculator Logic
-            const addEntryBtn = document.getElementById('add-entry-btn');
-            const dateEntriesContainer = document.getElementById('date-entries');
-            const calculateBtn = document.getElementById('calculate-btn');
-            const resultDiv = document.getElementById('calculation-result');
-            const ctx = document.getElementById('stay-chart').getContext('2d');
-            let stayChart;
-            let entryCount = 1;
-
-            addEntryBtn.addEventListener('click', () => {
-                entryCount++;
-                const newEntry = document.createElement('div');
-                newEntry.className = 'flex items-center gap-2';
-                newEntry.innerHTML = `
-                    <label for="entry${entryCount}" class="text-sm font-medium whitespace-nowrap">入境 ${entryCount}:</label>
-                    <input type="date" id="entry${entryCount}" class="form-input w-full p-2 border rounded-md">
-                    <label for="exit${entryCount}" class="text-sm font-medium whitespace-nowrap">出境 ${entryCount}:</label>
-                    <input type="date" id="exit${entryCount}" class="form-input w-full p-2 border rounded-md">
-                `;
-                dateEntriesContainer.appendChild(newEntry);
-            });
-
-            calculateBtn.addEventListener('click', () => {
-                const today = new Date();
-                const oneDay = 24 * 60 * 60 * 1000;
-                const windowEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-                const windowStart = new Date(windowEnd.getTime() - 179 * oneDay);
-
-                let totalDaysStayed = 0;
-                let stays = [];
-
-                for (let i = 1; i <= entryCount; i++) {
-                    const entryDateEl = document.getElementById(`entry${i}`);
-                    const exitDateEl = document.getElementById(`exit${i}`);
-                    if (entryDateEl.value && exitDateEl.value) {
-                        const entryDate = new Date(entryDateEl.value);
-                        const exitDate = new Date(exitDateEl.value);
-                        if (entryDate <= exitDate) {
-                            stays.push({ start: entryDate, end: exitDate });
-                        }
-                    }
-                }
-
-                for (let d = new Date(windowStart); d <= windowEnd; d.setDate(d.getDate() + 1)) {
-                    for (const stay of stays) {
-                        if (d >= stay.start && d <= stay.end) {
-                            totalDaysStayed++;
-                            break; 
-                        }
-                    }
-                }
-
-                const remainingDays = 90 - totalDaysStayed;
-                resultDiv.innerHTML = `在過去180天內，您已停留 <span class="text-red-600">${totalDaysStayed}</span> 天。
-                                       您還剩下 <span class="text-green-600">${remainingDays}</span> 天的免簽停留額度。`;
-                
-                updateChart(totalDaysStayed);
-            });
-            
-            function updateChart(daysStayed) {
-                const remainingDays = 90 - daysStayed;
-                if (stayChart) {
-                    stayChart.destroy();
-                }
-                stayChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['申根免簽90天額度'],
-                        datasets: [
-                            {
-                                label: '已用天數',
-                                data: [daysStayed],
-                                backgroundColor: 'rgba(239, 68, 68, 0.7)', // red-500
-                                borderWidth: 1
-                            },
-                            {
-                                label: '剩餘天數',
-                                data: [remainingDays > 0 ? remainingDays : 0],
-                                backgroundColor: 'rgba(34, 197, 94, 0.7)', // green-500
-                                borderWidth: 1
-                            }
-                        ]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                            },
-                            title: {
-                                display: true,
-                                text: '90天免簽額度使用情況'
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        return `${context.dataset.label}: ${context.raw} 天`;
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                stacked: true,
-                                max: 90,
-                                title: {
-                                    display: true,
-                                    text: '天數'
-                                }
-                            },
-                            y: {
-                                stacked: true
-                            }
-                        }
-                    }
-                });
-            }
-            
-            // Initial empty chart
-            updateChart(0);
+        const welcomeMessage = [
+            "Booting Hsiu-Chi Tsai's Portfolio OS...",
+            "System check... OK",
+            "Loading core modules... OK",
+            "Connecting to network... OK",
+            "Welcome!",
+            " ",
+            "請輸入指令以開始探索，或輸入 '<span class='command'>help</span>' 獲取指令列表。",
+            " ",
+        ];
+        
+        // Focus the input when clicking anywhere on the terminal
+        terminal.addEventListener('click', () => {
+            terminalInput.focus();
         });
+
+        terminalInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                const command = terminalInput.value.trim().toLowerCase();
+                terminalInput.value = '';
+
+                if(command) {
+                    runCommand(command);
+                } else {
+                    // If user just presses enter, show a new empty prompt
+                    const emptyPrompt = document.createElement('div');
+                    emptyPrompt.innerHTML = `<span class="prompt"></span>`;
+                    terminalContent.appendChild(emptyPrompt);
+                }
+            }
+        });
+
+        function runCommand(command) {
+            const commandLine = document.createElement('div');
+            commandLine.innerHTML = `<span class="prompt"></span><span class="command">${command}</span>`;
+            terminalContent.appendChild(commandLine);
+
+            if (command === 'clear') {
+                terminalContent.innerHTML = '';
+                executeLines(welcomeMessage, () => terminalInput.focus());
+                return;
+            }
+
+            const output = commands[command] || `指令錯誤: ${command}. 請輸入 'help' 查看可用指令。`;
+            const outputLine = document.createElement('div');
+            outputLine.className = 'output px-4 py-2';
+            outputLine.innerHTML = output;
+            terminalContent.appendChild(outputLine);
+
+            // Add click functionality to commands within the output
+            outputLine.querySelectorAll('.command').forEach(el => {
+                el.style.cursor = 'pointer';
+                const cmdText = el.textContent.replace(/[\/\s]/g, '');
+                if (commands.hasOwnProperty(cmdText)) {
+                    el.addEventListener('click', () => runCommand(cmdText));
+                }
+            });
+            
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function executeLines(lines, callback) {
+            let i = 0;
+            function nextLine() {
+                if (i < lines.length) {
+                    const lineDiv = document.createElement('div');
+                    lineDiv.className = 'output';
+                    lineDiv.innerHTML = lines[i];
+                    terminalContent.appendChild(lineDiv);
+                    i++;
+                    setTimeout(nextLine, 100);
+                } else if (callback) {
+                    callback();
+                }
+            }
+            nextLine();
+        }
+        
+        // Initial boot sequence
+        executeLines(welcomeMessage, () => {
+            runCommand('help');
+            terminalInput.focus();
+        });
+
     </script>
+
 </body>
 </html>
-�
