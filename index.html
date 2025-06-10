@@ -9,60 +9,50 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg: #2c001e;
+            --prompt-user: #76E07A;
+            --prompt-host: #88A9D4;
+            --prompt-dir: #58a6ff;
+            --text: #E5E5E5;
+            --command: #76E07A;
+            --output-title: #E5E5E5;
+            --link: #58a6ff;
+            --dir: #58a6ff;
+        }
         body {
-            background-color: #0d1117;
-            color: #c9d1d9;
+            background-color: #300a24;
+            color: var(--text);
             font-family: 'Fira Code', monospace;
         }
         .terminal {
             width: 100%;
             height: 100vh;
             overflow-y: auto;
-            background: #010409;
-            border: 1px solid #30363d;
-            box-shadow: 0 0 20px rgba(0, 128, 255, 0.1);
+            background: var(--bg);
+            border: 1px solid #4a1b3d;
+            box-shadow: 0 0 25px rgba(236, 72, 153, 0.15);
             cursor: text;
         }
-        .prompt::before {
-            content: 'user@hctsai1006:~$';
-            color: #58a6ff; /* 藍色 */
-            margin-right: 0.75rem;
-        }
-        .cursor {
-            display: inline-block;
-            width: 10px;
-            height: 1.2em;
-            background-color: #c9d1d9;
-            animation: blink 1s step-end infinite;
-            vertical-align: middle;
-        }
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-        .command {
-            color: #79c0ff;
-        }
-        .output {
-            white-space: pre-wrap;
-            color: #a5d6ff;
-        }
-        .output-title {
-            color: #1f6feb;
-            font-weight: bold;
-        }
-        .link {
-            color: #58a6ff;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        .link:hover {
-            color: #79c0ff;
-        }
+        .prompt > span:first-child { color: var(--prompt-user); }
+        .prompt > span:nth-child(2) { color: var(--text); }
+        .prompt > span:nth-child(3) { color: var(--prompt-host); }
+        .prompt > span:nth-child(4) { color: var(--text); }
+        .prompt > span:nth-child(5) { color: var(--prompt-dir); }
+        .prompt > span:last-child { color: var(--text); padding-left: 0.5rem; }
+        
+        .command { color: var(--command); }
+        .output { white-space: pre-wrap; color: var(--text); }
+        .output-title { color: var(--output-title); font-weight: bold; }
+        .link { color: var(--link); text-decoration: underline; cursor: pointer; }
+        .link:hover { filter: brightness(1.2); }
+        .dir-color { color: var(--dir); font-weight: bold; }
+
         #terminal-input {
             background: transparent;
             border: none;
             outline: none;
-            color: #79c0ff;
+            color: var(--command);
             width: 100%;
         }
     </style>
@@ -72,8 +62,10 @@
     <div id="terminal" class="terminal p-4 rounded-md">
         <div id="terminal-content"></div>
         <div class="flex items-center">
-            <div class="prompt"></div>
-            <input type="text" id="terminal-input" class="flex-1" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <div class="prompt" id="prompt-line">
+                <span>user</span><span>@</span><span>hctsai1006</span><span>:</span><span>~</span><span>$</span>
+            </div>
+            <input type="text" id="terminal-input" class="flex-1 ml-2" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
         </div>
     </div>
 
@@ -81,18 +73,23 @@
         const terminal = document.getElementById('terminal');
         const terminalContent = document.getElementById('terminal-content');
         const terminalInput = document.getElementById('terminal-input');
+        const promptLine = document.getElementById('prompt-line');
+
+        let commandHistory = [];
+        let historyIndex = 0;
         
         const commands = {
             'help': `
 <span class="output-title">可用指令:</span>
-  <span class="command">whoami</span>         - 關於我
-  <span class="command">ls ./projects</span>    - 專案與社會創新
+  <span class="command">profile</span>          - 關於我 (完整介紹)
+  <span class="command">whoami</span>           - 顯示目前使用者
+  <span class="command">ls -l ./projects</span> - 專案與社會創新
   <span class="command">cat honors.md</span>    - 主要榮譽與肯定
   <span class="command">./run_performance</span>- 跨域展演 (藝術 & 演說)
   <span class="command">connect</span>          - 聯絡方式
   <span class="command">clear</span>            - 清除畫面
 `,
-            'whoami': `
+            'profile': `
 <span class="output-title">hsiuchi_tsai (蔡秀吉 / 蔡廷羿)</span>
 --------------------------------------------------
 身份: AI研究者 / 社會創業家 / 前瞻科技轉譯者
@@ -101,13 +98,14 @@
 核心理念: 透過科技與行動，解決真實世界的問題。
 個人特質: 我的故事始於鄉村的泥土與夜市的喧囂，這份早熟的歷練，成為我所有行動的初衷。我相信教育與科技是翻轉生命最強大的力量。
 `,
-            'ls': `專案列表請輸入 <span class="command">ls ./projects</span>`,
-            'ls ./projects': `
-<span class="output-title">專案列表 (drwxr-xr-x):</span>
-<span class="command">語您童行/</span>       - [社會創新] 用台語、客語進行科學普及，獲教育部卓越行動獎。
-<span class="command">108課綱平台/</span>    - [教育科技] 針對城鄉資源不平等，為高中生打造開源升學平台。
-<span class="command">5G智慧醫療/</span>    - [前瞻應用] 以O-RAN專網優化醫院健檢流程，入圍經濟部5G競賽決賽。
-<span class="command">藝童教育/</span>       - [社會企業] 為弱勢及特殊需求學童提供線上才藝課程，獲創業競賽獎金。
+            'whoami': 'user',
+            'ls': `專案列表請輸入 <span class="command">ls -l ./projects</span>`,
+            'ls -l ./projects': `
+<span class="output-title">total 4</span>
+drwxr-xr-x 1 user user 4096 Jun 10 10:20 <span class="dir-color command">語您童行/</span>
+drwxr-xr-x 1 user user 4096 Jun 10 10:21 <span class="dir-color command">108課綱平台/</span>
+drwxr-xr-x 1 user user 4096 Jun 10 10:22 <span class="dir-color command">5G智慧醫療/</span>
+drwxr-xr-x 1 user user 4096 Jun 10 10:23 <span class="dir-color command">藝童教育/</span>
 `,
             'cat honors.md': `
 <span class="output-title"># 主要榮譽與肯定</span>
@@ -124,56 +122,78 @@
 
 <span class="command">傳統戲曲</span>
 - 蘭陽戲劇團: 擔綱《天公疼憨人》一劇主角。
-- 全國歌仔戲比賽: 從近三千人中脫穎而出，晉級複賽。
+- 全國歌仔戲比賽: 從近三千人中脫穎而出。
 
 <span class="command">演說與展演</span>
-- SITCON/COSCUP: 於大型技術年會擔任講者，曾以「全台語」發表演說。
-- 單口喜劇: 以個人生命故事為本，進行脫口秀表演。
+- SITCON/COSCUP: 於 SITCON X年會擔任講者，站上「中研院以全台語進行技術演說」。
+- 單口喜劇: 以孔乙己作為背景，用詼諧的方式，訴說著南部人北上讀書的各種不適應。
 - Podcast: 擔任新竹縣教育局青年播客代表，分享大學生活議題。
 `,
             'connect': `
 <span class="output-title">聯絡方式:</span>
-  Email: <a href="mailto:thc1006@ieee.org" class="link">thc1006@ieee.org</a>
-  Phone: +886-966745188
+  Email: <a href="mailto:hctsai@linux.com" class="link">hctsai@linux.com</a>
+  Facebook: <a href="https://www.fb.com/thc1006/" target="_blank" class="link">www.fb.com/thc1006/</a>
 `,
             'clear': ''
         };
 
         const welcomeMessage = [
+`
+    __ __ __          __ __   ___  __           __
+   / // /_ ____ __  / // /  / _ \\/ /_ _  __ __/ /
+  / _  / // /\\ \\ / / _  /  / ___/ / // |/ // // /
+ /_//_/\\_,_//_\\_\\ /_//_/  /_/  /_/\\_,_/|__/\\_,_/
+`,
+            " ",
             "Booting Hsiu-Chi Tsai's Portfolio OS...",
             "System check... OK",
-            "Loading core modules... OK",
-            "Connecting to network... OK",
             "Welcome!",
             " ",
             "請輸入指令以開始探索，或輸入 '<span class='command'>help</span>' 獲取指令列表。",
             " ",
         ];
         
-        // Focus the input when clicking anywhere on the terminal
-        terminal.addEventListener('click', () => {
-            terminalInput.focus();
-        });
+        terminal.addEventListener('click', () => terminalInput.focus());
 
         terminalInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
                 const command = terminalInput.value.trim().toLowerCase();
                 terminalInput.value = '';
 
-                if(command) {
+                if (command) {
+                    commandHistory.push(command);
+                    historyIndex = commandHistory.length;
                     runCommand(command);
                 } else {
-                    // If user just presses enter, show a new empty prompt
                     const emptyPrompt = document.createElement('div');
-                    emptyPrompt.innerHTML = `<span class="prompt"></span>`;
+                    const newPrompt = promptLine.cloneNode(true);
+                    emptyPrompt.appendChild(newPrompt);
                     terminalContent.appendChild(emptyPrompt);
+                }
+            } else if (event.key === 'ArrowUp') {
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    terminalInput.value = commandHistory[historyIndex];
+                }
+            } else if (event.key === 'ArrowDown') {
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    terminalInput.value = commandHistory[historyIndex];
+                } else if (historyIndex === commandHistory.length - 1) {
+                    historyIndex++;
+                    terminalInput.value = '';
                 }
             }
         });
 
         function runCommand(command) {
             const commandLine = document.createElement('div');
-            commandLine.innerHTML = `<span class="prompt"></span><span class="command">${command}</span>`;
+            const newPrompt = promptLine.cloneNode(true);
+            const commandText = document.createElement('span');
+            commandText.className = 'command ml-2';
+            commandText.textContent = command;
+            commandLine.appendChild(newPrompt);
+            commandLine.appendChild(commandText);
             terminalContent.appendChild(commandLine);
 
             if (command === 'clear') {
@@ -188,11 +208,11 @@
             outputLine.innerHTML = output;
             terminalContent.appendChild(outputLine);
 
-            // Add click functionality to commands within the output
             outputLine.querySelectorAll('.command').forEach(el => {
-                el.style.cursor = 'pointer';
-                const cmdText = el.textContent.replace(/[\/\s]/g, '');
+                const cmdText = el.textContent.trim();
+                // Check if the exact command text is a key in the commands object
                 if (commands.hasOwnProperty(cmdText)) {
+                    el.style.cursor = 'pointer';
                     el.addEventListener('click', () => runCommand(cmdText));
                 }
             });
@@ -206,7 +226,10 @@
                 if (i < lines.length) {
                     const lineDiv = document.createElement('div');
                     lineDiv.className = 'output';
-                    lineDiv.innerHTML = lines[i];
+                    // Use 'pre' tag for ASCII art to preserve formatting
+                    if(i === 0) lineDiv.innerHTML = `<pre>${lines[i]}</pre>`;
+                    else lineDiv.innerHTML = lines[i];
+                    
                     terminalContent.appendChild(lineDiv);
                     i++;
                     setTimeout(nextLine, 100);
@@ -217,7 +240,6 @@
             nextLine();
         }
         
-        // Initial boot sequence
         executeLines(welcomeMessage, () => {
             runCommand('help');
             terminalInput.focus();
