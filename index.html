@@ -19,6 +19,9 @@
             --output-title: #E5E5E5;
             --link: #58a6ff;
             --dir: #58a6ff;
+            --error: #f87171;
+            --neofetch-logo: #88A9D4;
+            --neofetch-title: #76E07A;
         }
         body {
             background-color: #300a24;
@@ -44,6 +47,7 @@
         .command { color: var(--command); }
         .output { white-space: pre-wrap; color: var(--text); }
         .output-title { color: var(--output-title); font-weight: bold; }
+        .error { color: var(--error); }
         .link { color: var(--link); text-decoration: underline; cursor: pointer; }
         .link:hover { filter: brightness(1.2); }
         .dir-color { color: var(--dir); font-weight: bold; }
@@ -77,6 +81,9 @@
 
         let commandHistory = [];
         let historyIndex = 0;
+        let isNetToolsInstalled = false;
+        let ifconfigFailCount = 0;
+        const startTime = new Date();
         
         const commands = {
             'help': `
@@ -86,14 +93,16 @@
   <span class="command">ls -l ./projects</span> - 專案與社會創新
   <span class="command">cat honors.md</span>    - 主要榮譽與肯定
   <span class="command">./run_performance</span>- 跨域展演 (藝術 & 演說)
+  <span class="command">neofetch</span>         - 顯示系統資訊
   <span class="command">connect</span>          - 聯絡方式
   <span class="command">clear</span>            - 清除畫面
+  <span class="command">reboot</span>           - 重新啟動
 `,
             'profile': `
 <span class="output-title">hctsai1006 (蔡秀吉)</span>
 --------------------------------------------------
 身份: 學術研究者 / 卯咪 / 前瞻科技轉譯者
-地點: 台灣，在北榮旁邊讀大學
+地點: 台灣，北榮旁邊讀大學
 學歷: 國立陽明交通大學 & 國立清華大學
 核心理念: 透過科技與行動，解決真實世界的問題。
 個人特質: 我的故事始於鄉村的泥土與夜市的喧囂，這份早熟的歷練，成為我所有行動的初衷。我相信教育與科技是翻轉生命最強大的力量。
@@ -122,19 +131,21 @@ drwxr-xr-x 1 user user 4096 Jun 10 10:23 <span class="dir-color command">藝童�
 
 <span class="command">傳統戲曲</span>
 - 蘭陽戲劇團: 擔綱《天公疼憨人》一劇主角。
-- 全國歌仔戲比賽: 從近三千人中脫穎而出。
+- 全國歌仔戲比賽: 從近三千人中脫穎而出，晉級複賽。
 
 <span class="command">演說與展演</span>
 - SITCON/COSCUP: 於 SITCON X年會擔任講者，站上「中研院以全台語進行技術演說」。
 - 單口喜劇: 以孔乙己作為背景，用詼諧的方式，訴說著南部人北上讀書的各種不適應。
 - Podcast: 擔任新竹縣教育局青年播客代表，分享大學生活議題。
 `,
+            'neofetch': ``, // Placeholder, will be generated dynamically
             'connect': `
 <span class="output-title">聯絡方式:</span>
   Email: <a href="mailto:hctsai@linux.com" class="link">hctsai@linux.com</a>
   Facebook: <a href="https://www.fb.com/thc1006/" target="_blank" class="link">www.fb.com/thc1006/</a>
 `,
-            'clear': ''
+            'clear': '',
+            'reboot': ''
         };
 
         const welcomeMessage = [
@@ -196,42 +207,206 @@ drwxr-xr-x 1 user user 4096 Jun 10 10:23 <span class="dir-color command">藝童�
             commandLine.appendChild(commandText);
             terminalContent.appendChild(commandLine);
 
-            if (command === 'clear') {
-                terminalContent.innerHTML = '';
-                executeLines(welcomeMessage, () => terminalInput.focus());
-                return;
-            }
-
-            const output = commands[command] || `指令錯誤: ${command}. 請輸入 'help' 查看可用指令。`;
-            const outputLine = document.createElement('div');
-            outputLine.className = 'output px-4 py-2';
-            outputLine.innerHTML = output;
-            terminalContent.appendChild(outputLine);
-
-            outputLine.querySelectorAll('.command').forEach(el => {
-                const cmdText = el.textContent.trim();
-                // Check if the exact command text is a key in the commands object
-                if (commands.hasOwnProperty(cmdText)) {
-                    el.style.cursor = 'pointer';
-                    el.addEventListener('click', () => runCommand(cmdText));
+            if (commands.hasOwnProperty(command)) {
+                let output = commands[command];
+                
+                if (command === 'clear' || command === 'reboot') {
+                    terminalContent.innerHTML = '';
+                    if (command === 'reboot') addOutput('Rebooting...');
+                    setTimeout(() => executeLines(welcomeMessage, () => terminalInput.focus()), command === 'reboot' ? 1000 : 0);
+                    return;
                 }
-            });
+                
+                if (command === 'neofetch') {
+                    output = generateNeofetch();
+                }
+
+                addOutput(output);
+            } else {
+                handleSpecialCommands(command);
+            }
             
             terminal.scrollTop = terminal.scrollHeight;
         }
+        
+        function addOutput(text) {
+            const line = document.createElement('div');
+            line.className = 'output px-4';
+            line.innerHTML = text;
+            terminalContent.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
 
+        function handleSpecialCommands(command) {
+            let output = '';
+            if (command.startsWith('ping')) {
+                simulatePing(command);
+                return;
+            }
+            switch(command) {
+                case 'ipconfig':
+                    output = `<span class="error">ipconfig: command not found</span>`;
+                    break;
+                case 'ifconfig':
+                    if (isNetToolsInstalled) {
+                        ifconfigFailCount++;
+                        if (ifconfigFailCount >= 2) {
+                            output = `<span class="error">我只是個網頁，無法執行...你怎麼不找找你自己的問題？</span>`;
+                        } else {
+                            output = `<span class="error">ifconfig: command failed</span>`;
+                        }
+                    } else {
+                        output = `Command 'ifconfig' not found, but can be installed with:\n<span class="command">sudo apt install net-tools</span>`;
+                    }
+                    break;
+                case 'sudo apt install net-tools':
+                    if (isNetToolsInstalled) {
+                        output = 'net-tools is already the newest version (2.10-alpha-2).';
+                    } else {
+                        simulateInstallation();
+                        return;
+                    }
+                    break;
+                case 'sudo rm -rf /':
+                    simulateSudoRm();
+                    return;
+                case 'dir':
+                    output = `Command 'dir' not found. Did you mean '<span class="command">ls</span>'?`;
+                    break;
+                case 'sl':
+                    output = `
+<pre>       ...____________________ ,
+      ..../ / | | | | | | | | | | |\\
+     ..// / / / / / / / / / / / / / /\\
+    .// / / / / / / / / / / / / / / /|\\
+ ..### / / / / / / / / / / / / / / / / |\\
+.#### / / / / / / / / / / / / / / / / /|
+...##================================##
+ ...../       /o\\       /o\\       /o\\
+ .....\\_____/ooo/_______/ooo/_______/ooo/</pre>`;
+                    break;
+                case 'exit':
+                     addOutput('Logging out...');
+                     setTimeout(() => {
+                        document.body.innerHTML = '<div class="h-screen w-screen flex items-center justify-center text-2xl">Connection closed.</div>';
+                     }, 1000);
+                     return;
+                default:
+                     output = `<span class="error">${command}: command not found</span>`;
+            }
+            addOutput(output);
+        }
+
+        function simulateInstallation() {
+            terminalInput.disabled = true;
+            const steps = [
+                'Reading package lists... Done', 'Building dependency tree... Done', 'Reading state information... Done',
+                'The following NEW packages will be installed:\n  net-tools', '0 upgraded, 1 newly installed, 0 to remove and 0 not upgraded.',
+                'Need to get 196 kB of archives.', 'After this operation, 821 kB of additional disk space will be used.'
+            ];
+            
+            let i = 0;
+            function nextStep() {
+                if (i < steps.length) {
+                    addOutput(steps[i]); i++; setTimeout(nextStep, 200);
+                } else {
+                    addOutput('Get:1 http://archive.ubuntu.com/ubuntu ... net-tools_amd64.deb [196 kB]');
+                    setTimeout(() => {
+                        addOutput('Unpacking net-tools (2.10-alpha-2) ...');
+                        setTimeout(() => {
+                            addOutput('Setting up net-tools (2.10-alpha-2) ...');
+                            isNetToolsInstalled = true; ifconfigFailCount = 0;
+                            terminalInput.disabled = false; terminalInput.focus();
+                        }, 500);
+                    }, 500);
+                }
+            }
+            nextStep();
+        }
+
+        function simulatePing(command) {
+            const target = command.split(' ')[1] || '127.0.0.1';
+            addOutput(`PING ${target} (::1) 56 data bytes`);
+            terminalInput.disabled = true;
+            let i = 0;
+            const interval = setInterval(() => {
+                if (i < 4) {
+                    const time = (Math.random() * 10 + 5).toFixed(3);
+                    addOutput(`64 bytes from ::1: icmp_seq=${i+1} ttl=64 time=${time} ms`);
+                    i++;
+                } else {
+                    clearInterval(interval);
+                    addOutput(`\n--- ${target} ping statistics ---`);
+                    addOutput(`4 packets transmitted, 4 received, 0% packet loss, time 3005ms`);
+                    addOutput(`rtt min/avg/max/mdev = 5.000/7.500/10.000/2.500 ms`);
+                    setTimeout(() => {
+                        addOutput(`<span class="error">Ping request timed out. Maybe the server is just shy.</span>`);
+                        terminalInput.disabled = false; terminalInput.focus();
+                    }, 500);
+                }
+            }, 1000);
+        }
+
+        function simulateSudoRm() {
+            terminalInput.disabled = true;
+            addOutput('[sudo] password for user: ');
+            setTimeout(() => {
+                addOutput('\n<span class="error">Whew! That was a close one.</span>');
+                addOutput('This is a web page, not a real server. My files are safe. And so are yours. 😉');
+                terminalInput.disabled = false; terminalInput.focus();
+            }, 2000);
+        }
+
+        function getUptime() {
+            const now = new Date();
+            const diff = now - startTime;
+            const minutes = Math.floor(diff / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            return `${minutes} mins, ${seconds} secs`;
+        }
+
+        function generateNeofetch() {
+            const uptime = getUptime();
+            const resolution = `${window.innerWidth}x${window.innerHeight}`;
+            const memory = `${Math.floor(Math.random() * 4096) + 2048}MiB / 16384MiB`;
+            const logo = `
+<pre style="color:var(--neofetch-logo)">
+          ./+o+-
+        yyyyy- -yyyyy+
+     ://+//////-yyyyyyo
+   .++ .yyyyyyy-//////o
+  /o/o+./yyyyyyyo///+/o
+ +o+o+o+--/oy/--/o/o/+
+  .ooo--/\`.-//-\`--ooo.
+   //o \`--- \` -o/o/o/.
+    -/o/o- -o/o/o//.
+     -o/o.\`-o/o/o/
+      -o/o.\`-o/o/
+        --..-
+</pre>`;
+            const info = `
+<span style="color:var(--neofetch-title)">user@hctsai1006</span>
+------------------
+<span style="color:var(--neofetch-title)">OS</span>: Portfolio.OS x86_64
+<span style="color:var(--neofetch-title)">Host</span>: Hsiu-Chi Tsai
+<span style="color:var(--neofetch-title)">Kernel</span>: 6.1.0-vanilla-js
+<span style="color:var(--neofetch-title)">Uptime</span>: ${uptime}
+<span style="color:var(--neofetch-title)">Shell</span>: bash 5.1.16 (sim)
+<span style="color:var(--neofetch-title)">Resolution</span>: ${resolution}
+<span style="color:var(--neofetch-title)">Theme</span>: Ubuntu-Vibes [HTML]
+<span style="color:var(--neofetch-title)">Terminal</span>: this.browser
+<span style="color:var(--neofetch-title)">CPU</span>: Your Brain
+<span style="color:var(--neofetch-title)">GPU</span>: Imagination
+<span style="color:var(--neofetch-title)">Memory</span>: ${memory}
+`;
+            return `<div class="flex">${logo}<div class="ml-4">${info}</div></div>`;
+        }
+        
         function executeLines(lines, callback) {
             let i = 0;
             function nextLine() {
                 if (i < lines.length) {
-                    const lineDiv = document.createElement('div');
-                    lineDiv.className = 'output';
-                    // Use 'pre' tag for ASCII art to preserve formatting
-                    if(i === 0) lineDiv.innerHTML = `<pre>${lines[i]}</pre>`;
-                    else lineDiv.innerHTML = lines[i];
-                    
-                    terminalContent.appendChild(lineDiv);
-                    i++;
+                    addOutput(lines[i]); i++;
                     setTimeout(nextLine, 100);
                 } else if (callback) {
                     callback();
