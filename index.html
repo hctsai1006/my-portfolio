@@ -1,503 +1,368 @@
 <!DOCTYPE html>
-<html lang="zh-Hant" class="scroll-smooth">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>蔡秀吉 | 互動式個人網站</title>
+    <title>申根簽證數學小老師：台灣學生專用</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- 
-    Chosen Palette: Warm Neutrals - A calm and professional base of whites and grays, with a sophisticated teal for accents and a dark slate for text.
-    Application Structure Plan: A thematic, single-page portfolio. The structure is designed for non-linear exploration, allowing users to dive into specific facets of Tsai's life (Journey, Tech, Innovation, etc.) via a sticky navigation bar. An interactive timeline is used for his personal story to make it engaging. Card-based layouts for projects allow for clean presentation, with modals providing deeper details on demand. This architecture was chosen to transform a dense, multi-page document into a digestible, user-driven experience that highlights his multi-faceted identity.
-    Visualization & Content Choices: 
-    - Personal Story (Pages 12-15): Goal: Inform/Engage -> Viz: Interactive horizontal timeline (HTML/CSS/JS). Interaction: Click nodes to open modals with details. Justification: More engaging than a wall of text, visualizes his journey of resilience.
-    - LGBTQ+ Attitude Study (Page 29): Goal: Compare/Analyze -> Viz: Grouped Bar Chart (Chart.js). Interaction: Buttons to filter data. Justification: Makes complex data from the table immediately comparable and understandable.
-    - Skills Overview: Goal: Inform/Organize -> Viz: Radar Chart (Chart.js). Interaction: Hover tooltips. Justification: Provides a quick, holistic visual summary of his diverse, cross-disciplinary skills.
-    - Projects (various pages): Goal: Inform/Showcase -> Viz: Grid of cards (HTML/Tailwind). Interaction: Click to open modals with images and descriptions. Justification: Organizes a large number of projects cleanly.
-    CONFIRMATION: NO SVG graphics used. NO Mermaid JS used.
+    <!-- Chosen Palette: Calm Neutrals with Clear Accents -->
+    <!-- Application Structure Plan: The application is designed as a scenario-based interactive guide. It starts with a high-level explanation of the two distinct travel rights (visa-free vs. D-visa). The core of the app is a set of interactive tabs allowing users to select their specific situation (e.g., "Travel before visa starts"). This immediately provides tailored information, which is more effective than reading a long report. It then includes an interactive calculator with a Chart.js visualization to make the abstract 90/180 rule tangible. Finally, it presents critical, non-negotiable advice (contact officials, document checklist) in a highly visible format. This structure guides the user from understanding concepts to applying them and taking necessary action, directly addressing the source report's complexity in a user-friendly, task-oriented way. -->
+    <!-- Visualization & Content Choices: 
+        - Core Concepts (Two Travel Rights): Goal: Inform/Distinguish. Method: Side-by-side HTML/Tailwind cards with Unicode icons (✈️, 🎓). Justification: Clear visual separation of the two key concepts.
+        - Main Scenarios: Goal: Organize/Navigate. Method: Interactive HTML tabs powered by JS. Justification: Allows users to self-select their context and receive focused, relevant information without being overwhelmed.
+        - 90/180 Rule Calculation: Goal: Explain a dynamic process. Method: Interactive date inputs with a Chart.js bar chart. Justification: Transforms the confusing "rolling window" rule into a personalized, visual calculation. Library: Chart.js (Canvas).
+        - Key Advice/Warnings: Goal: Inform/Warn. Method: Visually distinct callout cards (HTML/Tailwind) with icons (❗, �). Justification: Highlights the most critical, non-skippable information for user safety and compliance.
     -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f8fafc; /* slate-50 */
-            color: #334155; /* slate-700 */
+            background-color: #F8F7F4; /* Warm neutral background */
+        }
+        .tab-active {
+            background-color: #3B82F6; /* Accent blue */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .tab-inactive {
+            background-color: #E5E7EB; /* Light gray */
+            color: #374151; /* Dark gray text */
+        }
+        .content-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+            transition: all 0.3s ease-in-out;
         }
         .chart-container {
             position: relative;
-            height: 400px;
             width: 100%;
-            max-width: 800px;
-            margin: auto;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 350px;
         }
-        .nav-link {
-            transition: color 0.3s, border-color 0.3s;
-        }
-        .nav-link:hover, .nav-link.active {
-            color: #0d9488; /* teal-600 */
-            border-bottom-color: #0d9488;
-        }
-        .timeline-item {
-            position: relative;
-            padding-bottom: 2rem;
-            padding-left: 2.5rem;
-        }
-        .timeline-item:before {
-            content: '';
-            position: absolute;
-            left: 0.5rem;
-            top: 0.5rem;
-            width: 2px;
-            height: 100%;
-            background-color: #cbd5e1; /* slate-300 */
-        }
-        .timeline-dot {
-            position: absolute;
-            left: 0;
-            top: 0.5rem;
-            height: 1.25rem;
-            width: 1.25rem;
-            border-radius: 9999px;
-            background-color: #f8fafc;
-            border: 3px solid #0d9488; /* teal-600 */
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .timeline-dot:hover {
-            transform: scale(1.2);
-        }
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 50;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 0.5rem;
-            max-width: 90%;
-            width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            transform: scale(0.95);
-            transition: transform 0.3s;
-        }
-         .modal-overlay.active .modal-content {
-            transform: scale(1);
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-700">
+<body class="text-gray-800">
 
-    <header id="header" class="bg-white/80 backdrop-blur-md sticky top-0 z-40 shadow-sm">
-        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex-shrink-0">
-                    <a href="#hero" class="text-xl font-bold text-slate-800">蔡秀吉</a>
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">申根簽證數學小老師</h1>
+            <p class="mt-2 text-lg text-gray-600">為台灣留學生解析複雜的停留天數規定</p>
+        </header>
+
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-center mb-6">核心概念：您擁有兩種獨立的旅遊權利</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="content-card">
+                    <h3 class="flex items-center text-xl font-bold mb-3">
+                        <span class="text-2xl mr-3">✈️</span> 台灣護照免簽權
+                    </h3>
+                    <p class="text-gray-700">這是您的基本權利。適用於您學生簽證生效「前」或到期「後」的純旅遊期間。</p>
+                    <div class="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p class="font-semibold text-blue-800">規則：任何180天內，最多停留 <span class="text-xl font-bold">90</span> 天。</p>
+                    </div>
                 </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="#journey" class="nav-link px-3 py-2 text-sm font-medium text-slate-600 border-b-2 border-transparent">人生歷程</a>
-                        <a href="#tech" class="nav-link px-3 py-2 text-sm font-medium text-slate-600 border-b-2 border-transparent">技術與研究</a>
-                        <a href="#innovation" class="nav-link px-3 py-2 text-sm font-medium text-slate-600 border-b-2 border-transparent">社會創新</a>
-                        <a href="#arts" class="nav-link px-3 py-2 text-sm font-medium text-slate-600 border-b-2 border-transparent">多元才藝</a>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-
-        <section id="hero" class="text-center py-20">
-            <img src="https://raw.githubusercontent.com/hctsai1006/hctsai1006.github.io/main/%E8%AD%89%E4%BB%B6%E7%85%A7%E6%96%B9.jpg" alt="蔡秀吉個人照片" class="w-36 h-36 rounded-full mx-auto mb-6 ring-4 ring-teal-500/50 object-cover">
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">蔡秀吉</h1>
-            <p class="mt-4 text-lg md:text-xl text-teal-600 font-semibold">跨域創新者 | AI x 生醫 | 社會實踐家</p>
-            <p class="mt-6 max-w-3xl mx-auto text-slate-600">
-                我是一位充滿熱情的跨領域問題解決者，致力於運用前瞻科技解決真實世界的問題。成長於鄉村的經歷，驅使我不斷學習、勇於挑戰，並立志成為一座「搭橋者」，連結不同的知識領域，為社會創造更公平、更多元的價值。
-            </p>
-            <div class="mt-8 bg-teal-50 border-l-4 border-teal-500 text-teal-800 p-4 rounded-md max-w-2xl mx-auto">
-                <p class="font-bold">最高榮譽：2023 總統教育獎奮發向上獎</p>
-                <p class="text-sm mt-1">憑藉在逆境中展現的堅韌生命力，以及在學術、社會創新與跨領域實踐上的卓越成就，獲此國家級殊榮。</p>
-            </div>
-        </section>
-
-        <section id="journey" class="py-16">
-            <h2 class="text-3xl font-bold text-center mb-12 text-slate-900">人生歷程：一段逆境求生的旅程</h2>
-             <div class="max-w-4xl mx-auto">
-                <p class="text-center text-slate-600 mb-12">
-                    從鄉村到頂尖大學，從夜市學徒到科技先鋒，我的人生是一連串的挑戰與蛻變。這裡的每一個節點，都代表著一段克服困難、汲取力量的故事。點擊時間點，探索我如何將逆境化為養分，長成今日的模樣。
-                </p>
-                <div class="relative">
-                    <div class="timeline-item" data-modal="journey-1">
-                        <div class="timeline-dot"></div>
-                        <h3 class="text-lg font-semibold text-slate-800">鄉村童年與夜市磨練</h3>
-                        <p class="text-sm text-slate-500">12歲</p>
-                        <p class="mt-2 text-slate-600">出身中低收入家庭，在夜市當叫賣學徒，習得一口流利的台語與社會交際能力。</p>
-                    </div>
-                    <div class="timeline-item" data-modal="journey-2">
-                        <div class="timeline-dot"></div>
-                        <h3 class="text-lg font-semibold text-slate-800">家庭變故與從軍抉擇</h3>
-                        <p class="text-sm text-slate-500">高中畢業</p>
-                        <p class="mt-2 text-slate-600">父親罹癌、家中經濟遭逢重擊。為分攤家計，休學並志願投身海軍陸戰隊。</p>
-                    </div>
-                    <div class="timeline-item" data-modal="journey-3">
-                        <div class="timeline-dot"></div>
-                        <h3 class="text-lg font-semibold text-slate-800">自我探索與挑戰</h3>
-                        <p class="text-sm text-slate-500">19歲</p>
-                        <p class="mt-2 text-slate-600">離開原生家庭，開始獨立生活。這是一段深刻的自我探索時期，我學習面對並克服了重大的個人挑戰，這段經歷塑造了我堅韌的性格。</p>
-                    </div>
-                     <div class="timeline-item" data-modal="journey-4">
-                        <div class="timeline-dot"></div>
-                        <h3 class="text-lg font-semibold text-slate-800">重返校園與科技啟蒙</h3>
-                         <p class="text-sm text-slate-500">大學期間</p>
-                        <p class="mt-2 text-slate-600">重拾書本，進入陽明交大，貪婪地學習跨領域知識，並在資訊科技領域找到天賦。</p>
-                    </div>
-                     <div class="timeline-item" data-modal="journey-5">
-                        <div class="timeline-dot"></div>
-                        <h3 class="text-lg font-semibold text-slate-800">國際視野與展望</h3>
-                         <p class="text-sm text-slate-500">現在</p>
-                        <p class="mt-2 text-slate-600">榮獲教育部獎學金，將赴捷克查理大學與捷克理工大學進行醫學與電信工程的訪問研究。</p>
+                <div class="content-card">
+                    <h3 class="flex items-center text-xl font-bold mb-3">
+                        <span class="text-2xl mr-3">🎓</span> 學生簽證/居留許可附加權
+                    </h3>
+                    <p class="text-gray-700">這是您留學期間的額外福利。用於從您的留學國前往「其他」申根國家旅遊。</p>
+                    <div class="mt-4 bg-green-50 border border-green-200 rounded-lg p-3">
+                        <p class="font-semibold text-green-800">規則：任何180天內，在「其他申根國」最多停留 <span class="text-xl font-bold">90</span> 天。</p>
+                        <p class="text-sm text-green-700 mt-1">此天數獨立計算，且您在留學國的時間不算在內。</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="tech" class="py-16 bg-white rounded-lg shadow-lg">
-            <h2 class="text-3xl font-bold text-center mb-12 text-slate-900">技術與研究：在 5G O-RAN 的最前線</h2>
-             <p class="text-center text-slate-600 max-w-4xl mx-auto mb-12">
-                我專注於推動 5G 開放式無線接入網 (Open RAN) 技術，以打破傳統電信市場壟斷，促進網路基礎設施的普及。從學術研究到產業實踐，再到社群倡議，我全方位地投入這個足以改變未來通訊的領域。
-            </p>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-slate-50 p-6 rounded-md border border-slate-200">
-                    <h3 class="font-bold text-lg text-teal-700">產業實踐</h3>
-                    <p class="mt-2 text-sm">於**廣達電腦**擔任 O-RAN 研究實習生，參與商用級解決方案的研發。</p>
-                </div>
-                <div class="bg-slate-50 p-6 rounded-md border border-slate-200">
-                    <h3 class="font-bold text-lg text-teal-700">學術研究</h3>
-                    <p class="mt-2 text-sm">擔任**國科會**計畫研究助理，參與 O-RAN 核心技術開發、測試與雲原生 (Docker/K8s) 部署。</p>
-                </div>
-                <div class="bg-slate-50 p-6 rounded-md border border-slate-200">
-                    <h3 class="font-bold text-lg text-teal-700">技術貢獻</h3>
-                    <p class="mt-2 text-sm">製作的 5G O-RAN 科普教材，獲**經濟部工業局**採納，成為官方課程教材。</p>
-                </div>
-                 <div class="bg-slate-50 p-6 rounded-md border border-slate-200">
-                    <h3 class="font-bold text-lg text-teal-700">社群影響力</h3>
-                    <p class="mt-2 text-sm">在 **SITCON、COSCUP** 等台灣指標性技術年會擔任講者，是推廣 O-RAN 技術的先驅之一。</p>
-                </div>
-                <div class="bg-slate-50 p-6 rounded-md border border-slate-200">
-                    <h3 class="font-bold text-lg text-teal-700">創新應用</h3>
-                    <p class="mt-2 text-sm">以「O-RAN 專網實現醫院智慧人流分配」專案，入選**經濟部工業局通訊大賽決賽**。</p>
-                </div>
-                 <div class="bg-slate-50 p-6 rounded-md border border-slate-200">
-                    <h3 class="font-bold text-lg text-teal-700">跨域整合</h3>
-                    <p class="mt-2 text-sm">發表「O-RAN 結合低軌衛星通訊」論文，獲**臺灣海洋治理國際研討會論文獎**。</p>
-                </div>
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-center mb-6">情境模擬：點選您的情況</h2>
+            <div id="tabs" class="flex flex-wrap justify-center gap-3 mb-6">
+                <!-- Tabs will be inserted by JS -->
             </div>
-             <div class="mt-16">
-                <h3 class="text-2xl font-bold text-center mb-8 text-slate-800">多元技能光譜</h3>
-                <div class="chart-container h-96">
-                    <canvas id="skillsRadarChart"></canvas>
-                </div>
+            <div id="content" class="content-card min-h-[250px]">
+                <!-- Content will be inserted by JS -->
             </div>
         </section>
 
-        <section id="innovation" class="py-16">
-            <h2 class="text-3xl font-bold text-center mb-12 text-slate-900">社會創新：用科技回應社會需求</h2>
-             <p class="text-center text-slate-600 max-w-4xl mx-auto mb-12">
-                我相信科技的最終目的是服務人群。我的成長背景讓我對社會議題特別敏感，也因此發起了數個屢獲殊榮的社會創新專案，希望能用自己的力量，為這片土地帶來正向的改變。
-            </p>
-            <div class="space-y-8">
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col md:flex-row items-center gap-6">
-                    <img src="https://placehold.co/100x100/14b8a6/ffffff?text=語" alt="語您童行" class="w-24 h-24 rounded-lg object-cover">
-                    <div>
-                        <h3 class="font-bold text-xl text-slate-800">「語您童行」本土語言傳承計畫</h3>
-                        <p class="mt-2 text-slate-600">結合科技與創意，製作台語、客語科普內容，挑戰語言的刻板印象。此計畫榮獲**教育部「青年全球行動計畫卓越行動獎」**，並獲公視新聞台等媒體專訪報導。</p>
+        <section class="mb-12 content-card">
+            <h2 class="text-2xl font-bold text-center mb-2">停留天數計算機 (90/180天規則)</h2>
+            <p class="text-center text-gray-600 mb-6">用這個工具來規劃您的免簽旅遊行程。輸入您過去或計劃的每次出入境日期。</p>
+            <div id="calculator" class="space-y-4">
+                <div class="grid md:grid-cols-2 gap-4" id="date-entries">
+                    <div class="flex items-center gap-2">
+                        <label for="entry1" class="text-sm font-medium whitespace-nowrap">入境 1:</label>
+                        <input type="date" id="entry1" class="form-input w-full p-2 border rounded-md">
+                        <label for="exit1" class="text-sm font-medium whitespace-nowrap">出境 1:</label>
+                        <input type="date" id="exit1" class="form-input w-full p-2 border rounded-md">
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col md:flex-row items-center gap-6">
-                    <img src="https://placehold.co/100x100/38bdf8/ffffff?text=教" alt="偏鄉教育" class="w-24 h-24 rounded-lg object-cover">
-                    <div>
-                        <h3 class="font-bold text-xl text-slate-800">偏鄉教育資源整合平台</h3>
-                        <p class="mt-2 text-slate-600">為解決城鄉教育資源不平等問題，於 g0v 社群發起專案，打造一站式資源平台。此專案榮獲**零時小學校 Demo Day 競賽前五名**，並代表陽明交大參加 **Google 全球 Solution Challenge**。</p>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow flex flex-col md:flex-row items-center gap-6">
-                    <img src="https://placehold.co/100x100/a78bfa/ffffff?text=藝" alt="藝童教育" class="w-24 h-24 rounded-lg object-cover">
-                    <div>
-                        <h3 class="font-bold text-xl text-slate-800">「藝童教育」社創團隊</h3>
-                        <p class="mt-2 text-slate-600">共同創辦團隊，為弱勢家庭背景的學童提供線上藝術與文化課程，獲**陽明交大創新創業競賽**肯定與創業獎金支持。</p>
-                    </div>
+                <div class="flex justify-center gap-4">
+                    <button id="add-entry-btn" class="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors">增加一筆行程</button>
+                    <button id="calculate-btn" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors">計算</button>
                 </div>
             </div>
-             <div class="mt-16 bg-white p-8 rounded-lg shadow-lg">
-                <h3 class="text-2xl font-bold text-center mb-2 text-slate-800">教育社會學研究</h3>
-                 <p class="text-center text-slate-600 max-w-3xl mx-auto mb-8">
-                     除了實踐，我也透過學術研究探索社會議題。這份關於大學生對同志態度的研究，揭示了性別在同溫層中的微妙差異，並獲得校內通識課程專題競賽特優。
-                </p>
+            <div class="mt-6">
                 <div class="chart-container">
-                    <canvas id="attitudeChart"></canvas>
+                    <canvas id="stay-chart"></canvas>
                 </div>
-                 <div class="text-center mt-4">
-                    <button onclick="updateAttitudeChart('all')" class="bg-teal-500 text-white px-4 py-2 rounded-md text-sm hover:bg-teal-600 transition">全體</button>
-                    <button onclick="updateAttitudeChart('male')" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm hover:bg-slate-300 transition ml-2">僅男性</button>
-                    <button onclick="updateAttitudeChart('female')" class="bg-slate-200 text-slate-700 px-4 py-2 rounded-md text-sm hover:bg-slate-300 transition ml-2">僅女性</button>
-                </div>
-            </div>
-        </section>
-        
-        <section id="arts" class="py-16">
-            <h2 class="text-3xl font-bold text-center mb-12 text-slate-900">多元才藝：當科技人走上舞台</h2>
-             <p class="text-center text-slate-600 max-w-4xl mx-auto mb-12">
-                我相信，豐富的生命體驗能激發更多元的創造力。舞台表演是我探索自我、連結人群的另一種方式。從傳統戲曲到現代喜劇，我享受在不同角色間切換的樂趣。
-            </p>
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 text-center">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl mb-2">🎭</h3>
-                    <h4 class="font-bold text-lg text-slate-800">台灣唸歌 (歌仔戲)</h4>
-                    <p class="text-sm mt-2 text-slate-600">加入蘭陽戲劇團，擔綱《天公疼憨人》丑角主角。更從全國近三千名參賽者中脫穎而出，晉級 **全國歌仔戲比賽複賽** 。</p>
-                </div>
-                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl mb-2">🎤</h3>
-                    <h4 class="font-bold text-lg text-slate-800">脫口秀 (單口喜劇)</h4>
-                    <p class="text-sm mt-2 text-slate-600">以 [《大一上被二一，然後呢？》](https://www.youtube.com/watch?v=xIJCgx7jKbs) 為題，用詼諧反諷的段子，分享城鄉差距與個人生命經驗，獲得滿堂彩。</p>
-                </div>
-                 <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl mb-2">📰</h3>
-                    <h4 class="font-bold text-lg text-slate-800">台語播報與配音</h4>
-                    <p class="text-sm mt-2 text-slate-600">非本科系挑戰 **台北扶輪盃台語新聞播報競賽** 並獲優勝。同時也參與霹靂布袋戲培訓，以多變聲線進行配音。</p>
-                </div>
+                <div id="calculation-result" class="text-center mt-4 font-semibold text-lg"></div>
             </div>
         </section>
 
-    </main>
+        <section>
+            <h2 class="text-2xl font-bold text-center mb-6">最重要的事：關鍵提醒</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="content-card border-l-4 border-yellow-400">
+                    <h3 class="text-xl font-bold mb-3"><span class="mr-2">❗</span> 務必向官方確認</h3>
+                    <p class="text-gray-700">關於免簽和學生簽證身份的「轉換」，各國規定不同。這是最容易出錯的地方！</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1 text-sm">
+                        <li><strong>簽證生效前/後旅遊：</strong>必須向您的<span class="font-bold">留學國使領館</span>或<span class="font-bold">當地移民局</span>確認是否需要出入境來轉換身份。</li>
+                        <li>不要擅自假設！問清楚才能避免非法停留。</li>
+                    </ul>
+                </div>
+                <div class="content-card border-l-4 border-blue-400">
+                    <h3 class="text-xl font-bold mb-3"><span class="mr-2">📄</span> 隨身攜帶文件</h3>
+                    <p class="text-gray-700">即使在申根區內移動，也可能遇到抽查。請務必備齊：</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1 text-sm">
+                        <li>有效護照</li>
+                        <li>有效學生簽證 或 居留許可證</li>
+                        <li>財力證明</li>
+                        <li>旅遊醫療保險 (強烈建議)</li>
+                        <li>入學許可、住宿證明等</li>
+                    </ul>
+                </div>
+                <div class="content-card border-l-4 border-red-500">
+                    <h3 class="text-xl font-bold mb-3"><span class="mr-2">⚖️</span> 逾期停留後果嚴重</h3>
+                    <p class="text-gray-700">逾期停留會留下不良紀錄，影響未來簽證申請，並可能面臨：</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1 text-sm">
+                        <li>罰款</li>
+                        <li>被驅逐出境</li>
+                        <li>被註記在申根資訊系統 (SIS)</li>
+                        <li>短期或長期禁止入境申根區</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
 
-    <footer class="bg-slate-800 text-white py-8">
-        <div class="container mx-auto px-4 text-center text-slate-400">
-            <p>&copy; 2024 Hsiu-Chi (Ting-Yi) Tsai. All Rights Reserved.</p>
-            <p class="text-sm mt-2">此頁面由 AI 輔助，根據提供之資料生成。</p>
-        </div>
-    </footer>
-
-    <div id="modal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 id="modal-title" class="text-2xl font-bold mb-4 text-slate-900"></h3>
-            <div id="modal-body" class="text-slate-600 space-y-4"></div>
-            <button id="modal-close" class="mt-6 bg-teal-500 text-white px-4 py-2 rounded-md hover:bg-teal-600 transition">關閉</button>
-        </div>
+        <footer class="text-center text-gray-500 mt-12 text-sm">
+            <p>本工具為根據公開資訊整理的輔助指南，不能取代官方法律建議。</p>
+            <p>所有規定應以各國使領館、移民局等官方機構的最新解釋為準。</p>
+            <p class="mt-2">主要資料來源：<a href="https://hackmd.io/@thc1006/HJWiAGSmlg" target="_blank" class="text-blue-500 hover:underline">旅歐台灣學生注意事項 (HackMD) 蔡秀吉</a></p>
+        </footer>
     </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        
-        const modalData = {
-            'journey-1': {
-                title: '鄉村童年與夜市磨練',
-                body: `<p>在有記憶以來，家中就是中低收入戶。12歲時，我便步入社會，在夜市擔任叫賣學徒。這段經歷不僅讓我習得一口流利的台語，更教會我社會交際的應對進退與舌燦蓮花的功夫，成為我日後與人溝通的重要資產。</p><img src="https://placehold.co/400x250/e0f2f1/0f766e?text=夜市歲月" class="mt-4 rounded-lg w-full">`
-            },
-            'journey-2': {
-                title: '家庭變故與從軍抉擇',
-                body: '<p>高中畢業後，父親被診斷出鼻咽癌等多重癌症，家中修車廠也因地主停租而遭強拆，經濟頓時陷入絕境。看著同學們對大學生活充滿憧憬，我選擇了另一條路——暫緩升學，志願加入海軍陸戰隊，希望以每月四萬元的薪水，為家庭撐起一片天。</p>'
-            },
-            'journey-3': {
-                title: '自我探索與挑戰',
-                body: '<p>19歲那年，我離開原生家庭，開始獨立生活。這是一段深刻的自我探索時期，我學習面對並克服了重大的個人挑戰，這段經歷塑造了我堅韌的性格，也成為我日後面對困難時，永不放棄的力量來源。</p><img src="https://placehold.co/400x250/e0e7ff/4338ca?text=自我成長" class="mt-4 rounded-lg w-full">'
-            },
-            'journey-4': {
-                title: '重返校園與科技啟蒙',
-                body: '<p>放棄了軍旅生涯，我選擇重返校園，進入陽明交通大學。在這裡，我像海綿一樣貪婪地吸收各種跨領域的知識。雖然課業繁重，還需打工維持生計，但我憑藉著高度的專注力，在資訊科技領域找到了無與倫比的熱情與天賦，開啟了我的科技之路。</p>'
-            },
-            'journey-5': {
-                title: '國際視野與展望',
-                body: '<p>我的努力沒有白費。憑藉著在學術與社會創新領域的積累，我成功申請到教育部的公費獎學金，即將啟程前往捷克，在查理大學醫學院與捷克理工大學電信工程系進行為期十個月的訪問研究。這是我第一次踏出國門，也是我將台灣經驗與國際連結的重要一步。我相信，這段經歷將為我的未來帶來更廣闊的視野。</p><img src="https://placehold.co/400x250/f0f9ff/0284c7?text=邁向國際" class="mt-4 rounded-lg w-full">'
-            },
-        };
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabsContainer = document.getElementById('tabs');
+            const contentContainer = document.getElementById('content');
 
-        const modal = document.getElementById('modal');
-        const modalTitle = document.getElementById('modal-title');
-        const modalBody = document.getElementById('modal-body');
-        const modalClose = document.getElementById('modal-close');
-
-        document.querySelectorAll('[data-modal]').forEach(trigger => {
-            trigger.addEventListener('click', () => {
-                const modalId = trigger.dataset.modal;
-                const data = modalData[modalId];
-                if (data) {
-                    modalTitle.textContent = data.title;
-                    modalBody.innerHTML = data.body;
-                    modal.classList.add('active');
+            const scenarios = [
+                {
+                    title: '簽證生效前旅遊',
+                    content: `
+                        <h3 class="text-xl font-bold mb-3">情境：我想提早幾週到申根區玩，然後直接開始留學。</h3>
+                        <p class="mb-2"><strong>適用規則：</strong>台灣護照免簽權 (任何180天內，最多停留90天)。</p>
+                        <p class="mb-4">您提早旅遊的天數，會從這90天中扣除。</p>
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+                            <h4 class="font-bold text-yellow-800">⚡️ 最關鍵的行動：</h4>
+                            <p class="text-yellow-700">您<strong>必須</strong>向您的<strong class="font-semibold">留學目的國駐台辦事處</strong>確認：結束免簽旅遊後，是否可以直接在申根區內等到簽證生效日，還是<strong class="font-semibold">必須先出境、再持學生簽證重新入境</strong>。各國規定不同，千萬不能自己猜！</p>
+                        </div>
+                    `
+                },
+                {
+                    title: '留學期間去別國玩',
+                    content: `
+                        <h3 class="text-xl font-bold mb-3">情境：我持有A國的學生簽證/居留證，想趁假期去B、C國玩。</h3>
+                        <p class="mb-2"><strong>適用規則：</strong>學生簽證/居留許可附加權 (任何180天內，在「其他」申根國最多停留90天)。</p>
+                        <p class="mb-4">這個90天是獨立計算的！您在A國（留學國）居住和學習的時間，完全<strong class="font-semibold">不</strong>會消耗這個額度。</p>
+                        <div class="bg-green-50 border-l-4 border-green-400 p-4 rounded-r-lg">
+                             <h4 class="font-bold text-green-800">💡 聰明規劃：</h4>
+                            <p class="text-green-700">這是您的專屬福利！只要您持有有效的簽證/居留證，就可以利用這個額度暢遊其他申根國家。記得分開記錄您在「其他」申根國的旅遊天數即可。</p>
+                        </div>
+                    `
+                },
+                {
+                    title: '學業結束後旅遊',
+                    content: `
+                        <h3 class="text-xl font-bold mb-3">情境：我畢業了，居留證也快到期了，想再多留一段時間旅遊。</h3>
+                        <p class="mb-2"><strong>適用規則：</strong>回歸台灣護照免簽權 (任何180天內，最多停留90天)。</p>
+                        <p class="mb-4">好消息是，您過去以學生身份停留的時間<strong class="font-semibold">不會</strong>被用來計算這個新的90天額度。您理論上擁有一個全新的90天。</p>
+                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-r-lg">
+                            <h4 class="font-bold text-yellow-800">⚡️ 最關鍵的行動：</h4>
+                            <p class="text-yellow-700">和簽證生效前一樣，您<strong>必須</strong>向您<strong class="font-semibold">原留學國的移民局</strong>確認：居留證到期後，是否可以直接轉換為免簽身份繼續停留，還是<strong class="font-semibold">必須先離開申根區、再以免簽身份重新入境</strong>。這是避免非法逾期停留的關鍵！</p>
+                        </div>
+                    `
                 }
-            });
-        });
+            ];
 
-        const closeModal = () => {
-            modal.classList.remove('active');
-        };
-
-        modalClose.addEventListener('click', closeModal);
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                closeModal();
+            function renderTabs() {
+                tabsContainer.innerHTML = scenarios.map((s, i) => `
+                    <button class="tab-btn px-4 py-2 text-sm md:text-base rounded-md font-medium transition-all duration-200 ${i === 0 ? 'tab-active' : 'tab-inactive'}" data-index="${i}">
+                        ${s.title}
+                    </button>
+                `).join('');
             }
-        });
 
-        const navLinks = document.querySelectorAll('.nav-link');
-        const sections = document.querySelectorAll('section');
+            function renderContent(index) {
+                contentContainer.innerHTML = scenarios[index].content;
+            }
 
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.3
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    navLinks.forEach(link => {
-                        link.classList.toggle('active', link.getAttribute('href').substring(1) === entry.target.id);
+            tabsContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('tab-btn')) {
+                    const index = e.target.dataset.index;
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        btn.classList.remove('tab-active');
+                        btn.classList.add('tab-inactive');
                     });
+                    e.target.classList.add('tab-active');
+                    e.target.classList.remove('tab-inactive');
+                    renderContent(index);
                 }
             });
-        }, observerOptions);
+            
+            renderTabs();
+            renderContent(0);
 
-        sections.forEach(section => {
-            observer.observe(section);
-        });
+            // Calculator Logic
+            const addEntryBtn = document.getElementById('add-entry-btn');
+            const dateEntriesContainer = document.getElementById('date-entries');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const resultDiv = document.getElementById('calculation-result');
+            const ctx = document.getElementById('stay-chart').getContext('2d');
+            let stayChart;
+            let entryCount = 1;
 
-        const attitudeChartData = {
-            labels: ['友情接受度', '愛情接受度', '同情程度'],
-            all: {
-                male: [3.20, 2.85, 3.35],
-                female: [3.73, 3.56, 3.74]
-            },
-            male: {
-                male: [3.20, 2.85, 3.35], 
-                female: [3.49, 3.24, 3.46] 
-            },
-            female: {
-                male: [3.73, 3.56, 3.74], 
-                female: [3.74, 3.63, 3.79] 
-            }
-        };
+            addEntryBtn.addEventListener('click', () => {
+                entryCount++;
+                const newEntry = document.createElement('div');
+                newEntry.className = 'flex items-center gap-2';
+                newEntry.innerHTML = `
+                    <label for="entry${entryCount}" class="text-sm font-medium whitespace-nowrap">入境 ${entryCount}:</label>
+                    <input type="date" id="entry${entryCount}" class="form-input w-full p-2 border rounded-md">
+                    <label for="exit${entryCount}" class="text-sm font-medium whitespace-nowrap">出境 ${entryCount}:</label>
+                    <input type="date" id="exit${entryCount}" class="form-input w-full p-2 border rounded-md">
+                `;
+                dateEntriesContainer.appendChild(newEntry);
+            });
 
-        let attitudeChart;
-        const ctxAttitude = document.getElementById('attitudeChart').getContext('2d');
-        
-        window.updateAttitudeChart = (filter) => {
-            if(attitudeChart) {
-                attitudeChart.destroy();
-            }
+            calculateBtn.addEventListener('click', () => {
+                const today = new Date();
+                const oneDay = 24 * 60 * 60 * 1000;
+                const windowEnd = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                const windowStart = new Date(windowEnd.getTime() - 179 * oneDay);
 
-            let datasets;
-            let titleText = '大學生對同志態度之調查研究 (分數越高代表越正向)';
+                let totalDaysStayed = 0;
+                let stays = [];
 
-            if (filter === 'all') {
-                 datasets = [
-                    { label: '男性對男同志的平均態度', data: attitudeChartData.all.male, backgroundColor: 'rgba(59, 130, 246, 0.7)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 1 },
-                    { label: '女性對男同志的平均態度', data: attitudeChartData.all.female, backgroundColor: 'rgba(236, 72, 153, 0.7)', borderColor: 'rgba(236, 72, 153, 1)', borderWidth: 1 }
-                ];
-                titleText = '全體學生對同志態度比較';
-            } else if (filter === 'male') {
-                datasets = [
-                    { label: '男性對男同志態度', data: attitudeChartData.male.male, backgroundColor: 'rgba(59, 130, 246, 0.7)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 1 },
-                    { label: '男性對女同志態度', data: attitudeChartData.male.female, backgroundColor: 'rgba(236, 72, 153, 0.7)', borderColor: 'rgba(236, 72, 153, 1)', borderWidth: 1 }
-                ];
-                titleText = '男性受訪者對不同性別同志之態度比較';
-            } else { // female
-                 datasets = [
-                    { label: '女性對男同志態度', data: attitudeChartData.female.male, backgroundColor: 'rgba(59, 130, 246, 0.7)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 1 },
-                    { label: '女性對女同志態度', data: attitudeChartData.female.female, backgroundColor: 'rgba(236, 72, 153, 0.7)', borderColor: 'rgba(236, 72, 153, 1)', borderWidth: 1 }
-                ];
-                titleText = '女性受訪者對不同性別同志之態度比較';
-            }
+                for (let i = 1; i <= entryCount; i++) {
+                    const entryDateEl = document.getElementById(`entry${i}`);
+                    const exitDateEl = document.getElementById(`exit${i}`);
+                    if (entryDateEl.value && exitDateEl.value) {
+                        const entryDate = new Date(entryDateEl.value);
+                        const exitDate = new Date(exitDateEl.value);
+                        if (entryDate <= exitDate) {
+                            stays.push({ start: entryDate, end: exitDate });
+                        }
+                    }
+                }
 
-            attitudeChart = new Chart(ctxAttitude, {
-                type: 'bar',
-                data: {
-                    labels: attitudeChartData.labels,
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: { display: true, text: titleText, font: {size: 16} },
-                        tooltip: { mode: 'index', intersect: false }
+                for (let d = new Date(windowStart); d <= windowEnd; d.setDate(d.getDate() + 1)) {
+                    for (const stay of stays) {
+                        if (d >= stay.start && d <= stay.end) {
+                            totalDaysStayed++;
+                            break; 
+                        }
+                    }
+                }
+
+                const remainingDays = 90 - totalDaysStayed;
+                resultDiv.innerHTML = `在過去180天內，您已停留 <span class="text-red-600">${totalDaysStayed}</span> 天。
+                                       您還剩下 <span class="text-green-600">${remainingDays}</span> 天的免簽停留額度。`;
+                
+                updateChart(totalDaysStayed);
+            });
+            
+            function updateChart(daysStayed) {
+                const remainingDays = 90 - daysStayed;
+                if (stayChart) {
+                    stayChart.destroy();
+                }
+                stayChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['申根免簽90天額度'],
+                        datasets: [
+                            {
+                                label: '已用天數',
+                                data: [daysStayed],
+                                backgroundColor: 'rgba(239, 68, 68, 0.7)', // red-500
+                                borderWidth: 1
+                            },
+                            {
+                                label: '剩餘天數',
+                                data: [remainingDays > 0 ? remainingDays : 0],
+                                backgroundColor: 'rgba(34, 197, 94, 0.7)', // green-500
+                                borderWidth: 1
+                            }
+                        ]
                     },
-                    scales: {
-                        y: { beginAtZero: true, max: 5, grid: { color: '#e5e7eb' } },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        };
-
-        updateAttitudeChart('all');
-
-
-        const ctxRadar = document.getElementById('skillsRadarChart').getContext('2d');
-        new Chart(ctxRadar, {
-            type: 'radar',
-            data: {
-                labels: ['技術研發', '社會創新', '領導力', '溝通表達', '藝術才華', '學術研究'],
-                datasets: [{
-                    label: '蔡秀吉的技能分佈',
-                    data: [9, 9, 8, 10, 7, 8],
-                    fill: true,
-                    backgroundColor: 'rgba(13, 148, 136, 0.2)',
-                    borderColor: 'rgb(13, 148, 136)',
-                    pointBackgroundColor: 'rgb(13, 148, 136)',
-                    pointBorderColor: '#fff',
-                    pointHoverBackgroundColor: '#fff',
-                    pointHoverBorderColor: 'rgb(13, 148, 136)'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                elements: {
-                    line: {
-                        borderWidth: 3
-                    }
-                },
-                scales: {
-                    r: {
-                        angleLines: { color: '#cbd5e1' },
-                        grid: { color: '#e5e7eb' },
-                        pointLabels: { font: { size: 14 }, color: '#334155' },
-                        ticks: {
-                           backdropColor: 'transparent',
-                           stepSize: 2
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: '90天免簽額度使用情況'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.dataset.label}: ${context.raw} 天`;
+                                    }
+                                }
+                            }
                         },
-                        min: 0,
-                        max: 10
+                        scales: {
+                            x: {
+                                stacked: true,
+                                max: 90,
+                                title: {
+                                    display: true,
+                                    text: '天數'
+                                }
+                            },
+                            y: {
+                                stacked: true
+                            }
+                        }
                     }
-                },
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                }
+                });
             }
+            
+            // Initial empty chart
+            updateChart(0);
         });
-    });
-</script>
-
+    </script>
 </body>
 </html>
+�
