@@ -71,9 +71,12 @@
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
             z-index: 999;
-            display: flex;
+            display: none; /* Changed from flex to none */
             justify-content: center;
             align-items: center;
+        }
+        .modal-backdrop.visible {
+            display: flex; /* New class to show modal */
         }
         .modal-content {
             background-color: #1f2937;
@@ -216,7 +219,7 @@
                 </div>
                 <div id="action-card-container" class="flex items-start space-x-6 p-6 bg-gray-800 rounded-lg hidden">
                      <div class="flex-shrink-0 bg-indigo-500 w-16 h-16 rounded-full flex items-center justify-center text-3xl font-bold text-white mt-1">3</div>
-                     <div id="action-card-content">
+                     <div id="action-card-content" class="w-full">
                         <h3 class="text-2xl font-semibold text-white">接收智慧行動卡</h3>
                         <p class="text-gray-300">Copilot 的回應與行動建議將會顯示在這裡。</p>
                      </div>
@@ -346,37 +349,62 @@
         <div class="slide flex-col justify-center items-center p-8">
             <h2 class="text-4xl md:text-5xl font-bold text-center mb-4 text-indigo-300">財務預估</h2>
             <p class="text-xl text-center text-gray-400 mb-12 max-w-3xl">高毛利、高成長的 SaaS 商業潛力</p>
-            <div class="w-full max-w-4xl bg-gray-800 p-8 rounded-xl card-glow">
-                <div class="flex justify-around items-end h-72 space-x-4">
-                    <!-- 2026 -->
-                    <div class="flex flex-col items-center w-24">
-                        <div class="relative flex-grow w-full flex items-end">
-                            <div class="bar bg-cyan-400 w-full" style="height: 25%;"></div>
-                            <span class="absolute -top-7 text-white font-bold w-full text-center">$40M</span>
+            <div class="w-full max-w-6xl grid md:grid-cols-2 gap-8 items-center">
+                <div class="w-full bg-gray-800 p-8 rounded-xl card-glow">
+                    <div class="flex justify-around items-end h-72 space-x-4">
+                        <!-- 2026 -->
+                        <div class="flex flex-col items-center w-24">
+                            <div class="relative flex-grow w-full flex items-end">
+                                <div class="bar bg-cyan-400 w-full" style="height: 25%;"></div>
+                                <span class="absolute -top-7 text-white font-bold w-full text-center">$40M</span>
+                            </div>
+                            <span class="mt-2 text-white font-semibold">2026</span>
+                            <span class="text-sm text-cyan-200">45% 毛利</span>
                         </div>
-                        <span class="mt-2 text-white font-semibold">2026</span>
-                        <span class="text-sm text-cyan-200">45% 毛利</span>
+                         <!-- 2027 -->
+                        <div class="flex flex-col items-center w-24">
+                             <div class="relative flex-grow w-full flex items-end">
+                                <div class="bar bg-indigo-400 w-full" style="height: 60%;"></div>
+                                 <span class="absolute -top-7 text-white font-bold w-full text-center">$130M</span>
+                            </div>
+                            <span class="mt-2 text-white font-semibold">2027</span>
+                             <span class="text-sm text-indigo-200">58% 毛利</span>
+                        </div>
+                         <!-- 2028 -->
+                        <div class="flex flex-col items-center w-24">
+                             <div class="relative flex-grow w-full flex items-end">
+                                <div class="bar bg-fuchsia-500 w-full" style="height: 100%;"></div>
+                                 <span class="absolute -top-7 text-white font-bold w-full text-center">$300M</span>
+                            </div>
+                            <span class="mt-2 text-white font-semibold">2028</span>
+                             <span class="text-sm text-fuchsia-300">60% 毛利</span>
+                        </div>
                     </div>
-                     <!-- 2027 -->
-                    <div class="flex flex-col items-center w-24">
-                         <div class="relative flex-grow w-full flex items-end">
-                            <div class="bar bg-indigo-400 w-full" style="height: 60%;"></div>
-                             <span class="absolute -top-7 text-white font-bold w-full text-center">$130M</span>
+                     <p class="text-center mt-6 text-gray-400">預估年收入 (百萬 NTD)</p>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex items-start space-x-4">
+                        <svg class="w-8 h-8 text-cyan-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        <div>
+                            <h4 class="font-bold text-white">營收成長</h4>
+                            <p class="text-gray-400">從 PoC 和專案開始，快速轉向可持續的 SaaS 訂閱模式。</p>
                         </div>
-                        <span class="mt-2 text-white font-semibold">2027</span>
-                         <span class="text-sm text-indigo-200">58% 毛利</span>
                     </div>
-                     <!-- 2028 -->
-                    <div class="flex flex-col items-center w-24">
-                         <div class="relative flex-grow w-full flex items-end">
-                            <div class="bar bg-fuchsia-500 w-full" style="height: 100%;"></div>
-                             <span class="absolute -top-7 text-white font-bold w-full text-center">$300M</span>
+                     <div class="flex items-start space-x-4">
+                        <svg class="w-8 h-8 text-indigo-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01"></path></svg>
+                        <div>
+                            <h4 class="font-bold text-white">毛利優化</h4>
+                            <p class="text-gray-400">隨著 SaaS 訂閱比例提高，毛利率將從 45% 穩定增長至 60% 以上。</p>
                         </div>
-                        <span class="mt-2 text-white font-semibold">2028</span>
-                         <span class="text-sm text-fuchsia-300">60% 毛利</span>
+                    </div>
+                     <div class="flex items-start space-x-4">
+                        <svg class="w-8 h-8 text-fuchsia-400 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-5M3 4h5v5M21 4h-5v5M3 20h5v-5"></path></svg>
+                        <div>
+                            <h4 class="font-bold text-white">API 擴散</h4>
+                            <p class="text-gray-400">Digital-Twin API 的採用將成為第三年的關鍵成長驅動力。</p>
+                        </div>
                     </div>
                 </div>
-                 <p class="text-center mt-6 text-gray-400">預估年收入 (百萬 NTD)</p>
             </div>
         </div>
         
@@ -407,43 +435,48 @@
             </div>
         </div>
 
-        <!-- 投影片 11: 競爭格局 -->
+        <!-- 投影片 11: 競爭格局 (REBUILT) -->
         <div class="slide flex-col justify-center items-center p-8">
             <h2 class="text-4xl md:text-5xl font-bold text-center mb-12 text-indigo-300">競爭格局：我們開創了全新的賽道</h2>
-            <div class="w-full max-w-4xl aspect-square bg-gray-800/50 rounded-lg p-8 relative">
-                <!-- Axes Labels -->
-                <div class="absolute -bottom-2 left-0 right-0 text-center text-gray-400 text-sm md:text-base">傳統 2D 介面</div>
-                <div class="absolute -top-2 left-0 right-0 text-center text-white font-semibold text-sm md:text-base">沉浸式 3D 體驗</div>
-                <div class="absolute top-0 bottom-0 -left-6 md:-left-8 flex items-center transform -rotate-90">
-                    <span class="text-gray-400 text-sm md:text-base">數據呈現</span>
-                </div>
-                <div class="absolute top-0 bottom-0 -right-6 md:-right-8 flex items-center transform -rotate-90">
-                     <span class="text-white font-semibold text-sm md:text-base">智慧行動</span>
-                </div>
-                <!-- Axes lines -->
-                <div class="absolute inset-0 flex justify-center items-center">
-                    <div class="w-full h-px bg-gray-600"></div>
-                    <div class="h-full w-px bg-gray-600"></div>
-                </div>
-                <!-- Quadrant Content -->
-                <div class="relative w-full h-full">
-                    <div class="absolute bottom-1/2 left-0 w-1/2 h-1/2 p-4 flex flex-col justify-end items-start">
-                        <h4 class="font-bold text-lg text-gray-400">傳統 EAP</h4>
-                        <p class="text-sm text-gray-500">Perceptyx, Glint</p>
+            <div class="w-full max-w-4xl" style="aspect-ratio: 1 / 1;">
+                 <div class="w-full h-full grid grid-cols-[auto_1fr] grid-rows-[1fr_auto] gap-x-4 gap-y-2">
+                    <!-- Y-Axis Labels -->
+                    <div class="col-start-1 row-start-1 flex flex-col justify-around items-center">
+                        <span class="transform -rotate-90 whitespace-nowrap text-white font-semibold text-sm md:text-base">沉浸式 3D 體驗</span>
+                        <span class="transform -rotate-90 whitespace-nowrap text-gray-400 text-sm md:text-base">傳統 2D 介面</span>
                     </div>
-                    <div class="absolute bottom-1/2 right-0 w-1/2 h-1/2 p-4 flex flex-col justify-end items-end text-right">
-                         <div class="bg-indigo-500/80 p-4 rounded-lg shadow-2xl border border-indigo-300">
-                             <h4 class="font-bold text-xl text-white">Kintsugi AI+</h4>
-                             <p class="text-sm text-indigo-200">沉浸式體驗 + 智慧驅動</p>
+                    <!-- X-Axis Labels -->
+                     <div class="col-start-2 row-start-2 flex justify-around items-center">
+                         <span class="text-gray-400 text-sm md:text-base">數據呈現</span>
+                         <span class="text-white font-semibold text-sm md:text-base">智慧行動</span>
+                     </div>
+                    <!-- Quadrant Container -->
+                     <div class="col-start-2 row-start-1 relative">
+                        <!-- Axis Lines -->
+                        <div class="absolute inset-y-0 left-1/2 w-px bg-gray-600 -translate-x-1/2"></div>
+                        <div class="absolute inset-x-0 top-1/2 h-px bg-gray-600 -translate-y-1/2"></div>
+                        <!-- Quadrant Content Grid -->
+                        <div class="w-full h-full grid grid-cols-2 grid-rows-2">
+                            <div class="flex flex-col justify-end items-start p-4">
+                                <h4 class="font-bold text-lg text-gray-400">傳統 BI</h4>
+                                <p class="text-sm text-gray-500">Tableau, PowerBI</p>
+                            </div>
+                             <div class="flex flex-col justify-end items-end p-4 text-right">
+                                <!-- This is Top-Right -->
+                                <h4 class="font-bold text-lg text-gray-600">市場缺口</h4>
+                            </div>
+                            <div class="flex flex-col justify-start items-start p-4">
+                                <h4 class="font-bold text-lg text-gray-400">傳統 EAP</h4>
+                                <p class="text-sm text-gray-500">Perceptyx, Glint</p>
+                            </div>
+                             <div class="flex flex-col justify-start items-end p-4 text-right">
+                                <div class="bg-indigo-500/80 p-4 rounded-lg shadow-2xl border border-indigo-300">
+                                     <h4 class="font-bold text-xl text-white">Kintsugi AI+</h4>
+                                     <p class="text-sm text-indigo-200">沉浸式體驗 + 智慧驅動</p>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="absolute top-1/2 left-0 w-1/2 h-1/2 p-4 flex flex-col justify-start items-start">
-                         <h4 class="font-bold text-lg text-gray-400">傳統 BI</h4>
-                        <p class="text-sm text-gray-500">Tableau, PowerBI</p>
-                    </div>
-                    <div class="absolute top-1/2 right-0 w-1/2 h-1/2 p-4 flex flex-col justify-start items-end text-right">
-                        <h4 class="font-bold text-lg text-gray-600">市場缺口</h4>
-                    </div>
+                     </div>
                 </div>
             </div>
         </div>
@@ -478,7 +511,7 @@
     </div>
 
     <!-- Modal for AI Insight -->
-    <div id="insight-modal" class="modal-backdrop hidden">
+    <div id="insight-modal" class="modal-backdrop">
         <div class="modal-content">
             <h3 class="text-2xl font-bold text-white mb-4">✨ AI 生成的團隊洞察與建議</h3>
             <div id="insight-content" class="text-gray-300 space-y-4">
@@ -490,176 +523,190 @@
 
 
     <script>
-        // --- 基本簡報導航邏輯 ---
-        const slides = document.querySelectorAll('.slide');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const slideCounter = document.getElementById('slide-counter');
-        let currentSlide = 0;
-        const totalSlides = slides.length;
-
-        function updateSlides() {
-            slides.forEach((slide, index) => {
-                slide.classList.toggle('active', index === currentSlide);
-            });
-            slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
-            prevBtn.disabled = currentSlide === 0;
-            nextBtn.disabled = currentSlide === totalSlides - 1;
-            prevBtn.style.opacity = prevBtn.disabled ? '0.5' : '1';
-            nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
-        }
-
-        nextBtn.addEventListener('click', () => {
-            if (currentSlide < totalSlides - 1) currentSlide++;
-            updateSlides();
-        });
-
-        prevBtn.addEventListener('click', () => {
-            if (currentSlide > 0) currentSlide--;
-            updateSlides();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') nextBtn.click();
-            if (e.key === 'ArrowLeft') prevBtn.click();
-            if (e.key === 'Escape') closeModal(); // Close modal with Esc key
-        });
-
-        updateSlides();
-        
-        // --- Markdown 渲染與 Gemini API 整合邏輯 ---
-
-        /**
-         * 簡易的 Markdown 粗體轉換器
-         * @param {string} text - 包含 Markdown 的文本
-         * @returns {string} - 轉換為 HTML 的文本
-         */
-        function renderMarkdown(text) {
-             const boldRegex = /\*\*(.*?)\*\*/g;
-             return text
-                .replace(boldRegex, `<span class="font-bold-highlight">$1</span>`)
-                .replace(/\n/g, '<br>');
-        }
-
-        // 初始化時，遍歷整個文檔並轉換靜態 Markdown 內容
         document.addEventListener('DOMContentLoaded', () => {
-            const container = document.getElementById('presentation-container');
-            container.innerHTML = renderMarkdown(container.innerHTML);
-        });
+            // --- 元素獲取 ---
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const slideCounter = document.getElementById('slide-counter');
+            const generateInsightBtn = document.getElementById('generate-insight-btn');
+            const insightModal = document.getElementById('insight-modal');
+            const insightContent = document.getElementById('insight-content');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const askCopilotBtn = document.getElementById('ask-copilot-btn');
+            const copilotInput = document.getElementById('copilot-input');
+            const actionCardContainer = document.getElementById('action-card-container');
+            const actionCardContent = document.getElementById('action-card-content');
+            const copilotSpinner = document.getElementById('copilot-spinner');
+            const copilotBtnText = document.getElementById('copilot-btn-text');
 
-        const apiKey = ""; // API 金鑰將在執行環境中提供
+            let currentSlide = 0;
+            const totalSlides = slides.length;
+            const apiKey = ""; // API 金鑰將在執行環境中提供
 
-        // 獲取 Gemini 功能相關的 DOM 元素
-        const generateInsightBtn = document.getElementById('generate-insight-btn');
-        const insightModal = document.getElementById('insight-modal');
-        const insightContent = document.getElementById('insight-content');
-        const closeModalBtn = document.getElementById('close-modal-btn');
-        const askCopilotBtn = document.getElementById('ask-copilot-btn');
-        const copilotInput = document.getElementById('copilot-input');
-        const actionCardContainer = document.getElementById('action-card-container');
-        const actionCardContent = document.getElementById('action-card-content');
-        const copilotSpinner = document.getElementById('copilot-spinner');
-        const copilotBtnText = document.getElementById('copilot-btn-text');
-        
-        // 顯示/隱藏 Modal
-        const showModal = () => insightModal.classList.remove('hidden');
-        const closeModal = () => insightModal.classList.add('hidden');
-        
-        // 顯示/隱藏載入中狀態
-        const showLoading = (buttonText, spinner) => {
-            buttonText.classList.add('hidden');
-            spinner.classList.remove('hidden');
-        };
-        const hideLoading = (buttonText, spinner) => {
-            buttonText.classList.remove('hidden');
-            spinner.classList.add('hidden');
-        };
+            // --- 核心功能函數 ---
 
-        /**
-         * 呼叫 Gemini API 的通用函數
-         * @param {string} prompt - 傳送給模型的提示
-         * @returns {Promise<string>} - 模型生成的文本
-         */
-        async function callGeminiAPI(prompt) {
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            const payload = {
-                contents: [{ role: "user", parts: [{ text: prompt }] }],
-                generationConfig: {
-                    temperature: 0.7,
-                    topP: 1.0,
-                    maxOutputTokens: 512,
+            /**
+             * 更新投影片顯示和計數器
+             */
+            function updateSlides() {
+                slides.forEach((slide, index) => {
+                    slide.classList.toggle('active', index === currentSlide);
+                });
+                slideCounter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === totalSlides - 1;
+                prevBtn.style.opacity = prevBtn.disabled ? '0.5' : '1';
+                nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
+            }
+
+            /**
+             * 簡易的 Markdown 粗體轉換器
+             * @param {string} text - 包含 Markdown 的文本
+             * @returns {string} - 轉換為 HTML 的文本
+             */
+            function renderMarkdown(text) {
+                if (!text) return '';
+                const boldRegex = /\*\*(.*?)\*\*/g;
+                return text
+                    .replace(boldRegex, `<span class="font-bold-highlight">$1</span>`)
+                    .replace(/\n/g, '<br>');
+            }
+
+            /**
+             * 呼叫 Gemini API 的通用函數
+             * @param {string} prompt - 傳送給模型的提示
+             * @returns {Promise<string>} - 模型生成的文本
+             */
+            async function callGeminiAPI(prompt) {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const payload = {
+                    contents: [{ role: "user", parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        topP: 1.0,
+                        maxOutputTokens: 512,
+                    }
+                };
+                
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        console.error("API Error:", errorData);
+                        throw new Error(`API 請求失敗，狀態碼：${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    
+                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts[0].text) {
+                       return result.candidates[0].content.parts[0].text;
+                    } else {
+                       console.warn("API response is missing expected content:", result);
+                       return "抱歉，AI 無法生成有效的回應。請檢查 API 回應結構。";
+                    }
+                } catch (error) {
+                    console.error("Gemini API 呼叫失敗:", error);
+                    return `發生錯誤：${error.message}`;
                 }
+            }
+
+            // --- UI 輔助函數 ---
+            const showModal = () => insightModal.classList.add('visible');
+            const closeModal = () => insightModal.classList.remove('visible');
+            
+            const showLoading = (buttonText, spinner) => {
+                buttonText.classList.add('hidden');
+                spinner.classList.remove('hidden');
+                askCopilotBtn.disabled = true;
+            };
+            const hideLoading = (buttonText, spinner) => {
+                buttonText.classList.remove('hidden');
+                spinner.classList.add('hidden');
+                askCopilotBtn.disabled = false;
             };
             
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+            // --- 事件監聽器綁定 ---
 
-                if (!response.ok) {
-                    throw new Error(`API 請求失敗，狀態碼：${response.status}`);
+            // 導航按鈕
+            nextBtn.addEventListener('click', () => {
+                if (currentSlide < totalSlides - 1) {
+                    currentSlide++;
+                    updateSlides();
+                }
+            });
+
+            prevBtn.addEventListener('click', () => {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    updateSlides();
+                }
+            });
+
+            // 鍵盤導航
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight') nextBtn.click();
+                else if (e.key === 'ArrowLeft') prevBtn.click();
+                else if (e.key === 'Escape') closeModal();
+            });
+
+            // AI 功能: 生成洞察
+            generateInsightBtn.addEventListener('click', async () => {
+                insightContent.innerHTML = '<div class="flex justify-center"><div class="spinner"></div></div>';
+                showModal();
+                const prompt = "您是一位頂尖的組織心理學顧問。您在一個 3D 組織數據儀表板 (Spatial Insight Hub) 中發現，某個關鍵的研發團隊近期士氣低落、跨部門溝通頻率顯著下降。請生成三項具體、創新且可行的團隊建立活動建議，以解決此問題。請用繁體中文以條列式清單呈現，並在重點詞彙前後加上**符號，例如 **重點**。";
+                const result = await callGeminiAPI(prompt);
+                insightContent.innerHTML = renderMarkdown(result);
+            });
+
+            // AI 功能: 對話式副駕
+            askCopilotBtn.addEventListener('click', async () => {
+                const question = copilotInput.value.trim();
+                if (!question) {
+                    actionCardContainer.classList.remove('hidden');
+                    actionCardContent.innerHTML = `<h3 class="text-2xl font-semibold text-yellow-400">請先輸入您的問題</h3><p class="text-gray-300">請在上方輸入框中提出您想問 Copilot 的問題。</p>`;
+                    return;
                 }
                 
-                const result = await response.json();
-                
-                if (result.candidates && result.candidates.length > 0) {
-                   return result.candidates[0].content.parts[0].text;
-                } else {
-                   return "抱歉，AI 無法生成回應。請稍後再試。";
-                }
-            } catch (error) {
-                console.error("Gemini API 呼叫失敗:", error);
-                return `發生錯誤：${error.message}`;
-            }
-        }
+                showLoading(copilotBtnText, copilotSpinner);
 
-        // --- 功能 1: 生成團隊洞察 ---
-        generateInsightBtn.addEventListener('click', async () => {
-            insightContent.innerHTML = '<div class="flex justify-center"><div class="spinner"></div></div>';
-            showModal();
+                const prompt = `您是 Kintsugi AI+ 平台中的「對話式副駕 (Conversational Copilot)」。一位主管向您提問：「${question}」。假設背景數據顯示該團隊（例如東京團隊）有高工時、低參與度的風險。您的任務是： 1. 直接回答主管的問題。 2. 以此生成一張「智慧行動卡 (Nudge Action Card)」，包含一個具體的「建議標題」和一段經過「文化潤飾」的「建議內容」。請使用繁體中文，並用以下格式回覆，不要添加任何 markdown 標籤語法：\n[行動卡標題]：(您的標題)\n[行動卡內容]：(您的內容，請在重點詞彙前後加上**符號，例如 **重點** )`;
+                const result = await callGeminiAPI(prompt);
 
-            const prompt = "您是一位頂尖的組織心理學顧問。您在一個 3D 組織數據儀表板 (Spatial Insight Hub) 中發現，某個關鍵的研發團隊近期士氣低落、跨部門溝通頻率顯著下降。請生成三項具體、創新且可行的團隊建立活動建議，以解決此問題。請用繁體中文以條列式清單呈現。";
-            
-            const result = await callGeminiAPI(prompt);
-            insightContent.innerHTML = renderMarkdown(result);
-        });
+                const titleMatch = result.match(/\[行動卡標題\]：(.*)/);
+                const contentMatch = result.match(/\[行動卡內容\]：(.*)/s);
 
-        closeModalBtn.addEventListener('click', closeModal);
-        insightModal.addEventListener('click', (e) => {
-            if (e.target === insightModal) {
-                closeModal();
-            }
-        });
+                const cardTitle = titleMatch ? titleMatch[1].trim() : "AI 生成的行動建議";
+                const cardContent = contentMatch ? contentMatch[1].trim() : result;
 
-        // --- 功能 2: 互動式 AI Copilot ---
-        askCopilotBtn.addEventListener('click', async () => {
-            const question = copilotInput.value.trim();
-            if (!question) {
+                actionCardContent.innerHTML = `<h3 class="text-2xl font-semibold text-white">${cardTitle}</h3><p class="text-gray-300 mt-2">${renderMarkdown(cardContent)}</p>`;
                 actionCardContainer.classList.remove('hidden');
-                actionCardContent.innerHTML = `<h3 class="text-2xl font-semibold text-yellow-400">請先輸入您的問題</h3><p class="text-gray-300">請在上方輸入框中提出您想問 Copilot 的問題。</p>`;
-                return;
-            }
-            
-            showLoading(copilotBtnText, copilotSpinner);
-            askCopilotBtn.disabled = true;
+                
+                hideLoading(copilotBtnText, copilotSpinner);
+            });
 
-            const prompt = `您是 Kintsugi AI+ 平台中的「對話式副駕 (Conversational Copilot)」。一位主管向您提問：「${question}」。假設背景數據顯示該團隊（例如東京團隊）有高工時、低參與度的風險。您的任務是： 1. 直接回答主管的問題。 2. 以此生成一張「智慧行動卡 (Nudge Action Card)」，包含一個具體的「建議標題」和一段經過「文化潤飾」的「建議內容」。請使用繁體中文，並用以下格式回覆，不要添加任何 markdown 語法：\n[行動卡標題]：(您的標題)\n[行動卡內容]：(您的內容)`;
+            // Modal 關閉按鈕
+            closeModalBtn.addEventListener('click', closeModal);
+            insightModal.addEventListener('click', (e) => {
+                if (e.target === insightModal) {
+                    closeModal();
+                }
+            });
 
-            const result = await callGeminiAPI(prompt);
+            // --- 初始化 ---
+            // 遍歷所有文字節點，修正靜態內容的 Markdown
+            const textElements = document.querySelectorAll('p, h1, h2, h3, h4, li, blockquote');
+            textElements.forEach(el => {
+                el.innerHTML = renderMarkdown(el.innerHTML);
+            });
 
-            const titleMatch = result.match(/\[行動卡標題\]：(.*)/);
-            const contentMatch = result.match(/\[行動卡內容\]：(.*)/s);
-
-            const cardTitle = titleMatch ? titleMatch[1].trim() : "AI 生成的行動建議";
-            const cardContent = contentMatch ? contentMatch[1].trim() : result;
-
-            actionCardContent.innerHTML = `<h3 class="text-2xl font-semibold text-white">${cardTitle}</h3><p class="text-gray-300 mt-2">${renderMarkdown(cardContent)}</p>`;
-            actionCardContainer.classList.remove('hidden');
-            
-            hideLoading(copilotBtnText, copilotSpinner);
-            askCopilotBtn.disabled = false;
+            // 顯示第一張投影片
+            updateSlides();
         });
 
     </script>
