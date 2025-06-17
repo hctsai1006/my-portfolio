@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智慧選品 | AI 驅動中小電商進貨決策平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #4F46E5, #0EA5E9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .section-title {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-weight: 900;
+        }
+        .cta-button {
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .flow-arrow {
+            color: #D1D5DB; /* text-gray-300 */
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header / Navigation -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold gradient-text">智慧選品</h1>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#problem" class="text-gray-600 hover:text-indigo-600 transition">市場痛點</a>
+                <a href="#solution" class="text-gray-600 hover:text-indigo-600 transition">解決方案</a>
+                <a href="#pricing" class="text-gray-600 hover:text-indigo-600 transition">方案定價</a>
+                <a href="#team" class="text-gray-600 hover:text-indigo-600 transition">關於我們</a>
+            </nav>
+            <a href="#contact" class="hidden md:inline-block bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg cta-button">預約產品演示</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="py-20 md:py-32 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-4xl md:text-6xl font-black text-gray-900 leading-tight section-title">告別<span class="text-red-500">庫存賭局</span><br>擁抱<span class="gradient-text">智慧選品</span></h2>
+                <p class="mt-6 text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">我們將複雜數據轉化為精準、可執行的進貨建議，成為您的電商智慧副駕，顯著降低庫存風險，最大化您的商業利潤。</p>
+                <div class="mt-10 flex justify-center space-x-4">
+                    <a href="#contact" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg text-lg cta-button">預約免費演示</a>
+                    <a href="#solution" class="bg-gray-200 text-gray-800 font-bold py-3 px-8 rounded-lg text-lg cta-button">了解更多</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem Section -->
+        <section id="problem" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h3 class="text-3xl md:text-4xl section-title">您的營運痛點，我們感同身受</h3>
+                    <p class="mt-4 text-lg text-gray-600">在飽和的電商市場，這些挑戰是否已從「不便」演變為「致命傷」？</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                        <h4 class="text-xl font-bold text-indigo-700">現金流扼殺</h4>
+                        <p class="mt-2 text-gray-600">進貨成本佔據大量資金，一旦滯銷就陷入「有營收，沒現金」的死亡螺旋。</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                        <h4 class="text-xl font-bold text-indigo-700">高風險選品</h4>
+                        <p class="mt-2 text-gray-600">依賴直覺和手動觀察，每次進貨都像一場賭博，賭錯就是一批「死庫存」。</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                        <h4 class="text-xl font-bold text-indigo-700">供應鏈脆弱</h4>
+                        <p class="mt-2 text-gray-600">爆款商品常面臨斷貨或代理權被收回，被迫不斷尋找下一個未知爆款。</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+                        <h4 class="text-xl font-bold text-indigo-700">工具鏈斷層</h4>
+                        <p class="mt-2 text-gray-600">現有工具只能回顧「賣了什麼」，卻無法預測「該進什麼？進多少？」。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solution Section -->
+        <section id="solution" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h3 class="text-3xl md:text-4xl section-title">我們的解決方案：從「猜測」到「科學」</h3>
+                    <p class="mt-4 text-lg text-gray-600">「智慧選品」獨創三層 AI 決策引擎，將數據轉化為您的競爭優勢。</p>
+                </div>
+
+                <!-- AI Model Flowchart -->
+                <div class="max-w-5xl mx-auto">
+                    <div class="flex flex-col md:space-y-0 md:flex-row md:space-x-4 justify-center items-center md:items-start text-center">
+                        <!-- Step 1: Input -->
+                        <div class="flex-1 bg-gray-100 p-4 rounded-lg shadow-sm border border-gray-200 w-full md:w-auto mb-4 md:mb-0">
+                            <div class="text-indigo-600 font-bold text-sm">STEP 1</div>
+                            <h4 class="font-bold mt-1">用戶輸入新品資訊</h4>
+                            <p class="text-xs text-gray-500">輸入想評估的商品</p>
+                        </div>
+
+                        <div class="flow-arrow transform rotate-90 md:rotate-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                        </div>
+
+                        <!-- Step 2: 3-Layer Engine -->
+                        <div class="flex-1 bg-white p-6 rounded-xl shadow-lg border-2 border-indigo-100 w-full md:w-auto mb-4 md:mb-0">
+                            <div class="text-indigo-600 font-bold text-sm">STEP 2</div>
+                            <h4 class="font-bold mt-1 mb-4">三層 AI 數據引擎分析</h4>
+                            <div class="space-y-3 text-left text-sm">
+                                <div class="bg-indigo-50 p-3 rounded-md"><b>第一層：歷史銷售分析</b><p class="text-xs text-gray-600">串接 Shopify/SHOPLINE，找出相似品銷售曲線</p></div>
+                                <div class="bg-indigo-50 p-3 rounded-md"><b>第二層：AI 顧客模擬</b><p class="text-xs text-gray-600">模擬匿名顧客數據，預測潛在購買意願</p></div>
+                                <div class="bg-indigo-50 p-3 rounded-md"><b>第三層：在地市場感知</b><p class="text-xs text-gray-600">分析 Dcard/PTT 等社群宏觀趨勢與情緒</p></div>
+                            </div>
+                        </div>
+
+                        <div class="flow-arrow transform rotate-90 md:rotate-0">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                        </div>
+                        
+                        <!-- Step 3: Output -->
+                        <div class="flex-1 bg-gray-100 p-4 rounded-lg shadow-sm border border-gray-200 w-full md:w-auto">
+                           <div class="text-indigo-600 font-bold text-sm">STEP 3</div>
+                            <h4 class="font-bold mt-1">取得可執行的決策建議</h4>
+                            <div class="mt-2 bg-white p-3 rounded-lg shadow-inner text-left text-sm">
+                                <p class="font-bold">建議進貨 <span class="gradient-text">8 - 12</span> 件</p>
+                                <p class="text-xs text-green-600 font-semibold">信賴度分數：85%</p>
+                                <p class="text-xs text-gray-500 mt-1">附上完整決策理據...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-20 bg-indigo-50 p-8 md:p-12 rounded-2xl text-center max-w-4xl mx-auto border-2 border-indigo-100">
+                    <h4 class="text-2xl md:text-3xl font-bold text-gray-900 section-title">最終，您將獲得的不只是一個數字</h4>
+                    <p class="mt-4 text-lg text-gray-700">我們提供具體、可執行的建議，並附上清晰的決策理據與信賴度分數，讓您能信任、敢採用。</p>
+                    <div class="mt-6 bg-white p-6 rounded-xl shadow-lg inline-block text-left">
+                        <p class="text-sm text-gray-500">新品：復古碎花泡泡袖洋裝</p>
+                        <p class="text-2xl md:text-3xl font-bold my-2">建議進貨 <span class="gradient-text">8 - 12</span> 件</p>
+                        <p class="text-sm font-semibold text-green-600">信賴度分數：85%</p>
+                        <ul class="mt-4 text-sm text-gray-600 list-disc list-inside space-y-1">
+                            <li>基於過往相似品「復古長洋裝」的銷售速度。</li>
+                            <li>關鍵字「泡泡袖」在 Dcard 討論熱度近一週上升 200%。</li>
+                            <li>AI 顧客模擬顯示「上班族」客群有高度興趣。</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        
+        <!-- Why Us Section -->
+        <section id="why-us" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h3 class="text-3xl md:text-4xl section-title">我們為何與眾不同？</h3>
+                    <p class="mt-4 text-lg text-gray-600">我們不做「後照鏡」或「探照燈」，我們是您在商場上的「精準 GPS 導航」。</p>
+                </div>
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div>
+                        <h4 class="text-2xl font-bold mb-4">開創無人競爭的「白色地帶」</h4>
+                        <p class="text-gray-600 mb-6">在功能強大但遙不可及的企業級方案，與價格親民但功能淺薄的基礎工具之間，我們為中小企業量身打造了一個提供深度指導能力且價格可負擔的解決方案。</p>
+                        <div class="space-y-4">
+                            <p class="font-semibold"><span class="text-indigo-600 mr-2">✓ 整合性洞察：</span>融合歷史、模擬、熱度三層信號的獨家決策引擎。</p>
+                            <p class="font-semibold"><span class="text-indigo-600 mr-2">✓ 超在地化數據：</span>深度解讀 Dcard、PTT 在地文化脈絡，建立在地優勢。</p>
+                            <p class="font-semibold"><span class="text-indigo-600 mr-2">✓ 可解釋 AI：</span>透明的決策理據，將 AI 從黑盒子變為您能信任的夥伴。</p>
+                        </div>
+                    </div>
+                    <!-- 2x2 Matrix -->
+                    <div class="relative p-8">
+                        <!-- Y-Axis Label -->
+                        <div class="absolute left-0 top-1/2 -translate-x-full -rotate-90 text-center text-sm font-bold text-gray-500 w-32">目標市場</div>
+                        <!-- X-Axis Label -->
+                        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full text-center text-sm font-bold text-gray-500 w-full py-2">分析範疇</div>
+                        
+                        <div class="grid grid-cols-2 grid-rows-2 gap-1 bg-gray-200 border-2 border-gray-200 rounded-xl shadow-xl overflow-hidden">
+                            <!-- Top-Left Quadrant -->
+                            <div class="p-4 bg-white h-32 md:h-40">
+                                <h5 class="font-bold text-gray-400">大型企業 / 僅內部數據</h5>
+                            </div>
+                            
+                            <!-- Top-Right Quadrant -->
+                            <div class="p-4 bg-white h-32 md:h-40">
+                                <h5 class="font-bold text-gray-800">大型企業 / 內部+外部數據</h5>
+                                <p class="text-xs text-gray-500 mt-2">企業級巨頭佔據</p>
+                                <ul class="text-xs text-gray-600 mt-1 space-y-0.5">
+                                    <li>Oracle, Cin7, Zionex</li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Bottom-Left Quadrant -->
+                            <div class="p-4 bg-white h-32 md:h-40">
+                                <h5 class="font-bold text-gray-800">中小企業 / 僅內部數據</h5>
+                                <p class="text-xs text-gray-500 mt-2">現有電商應用程式 (紅海市場)</p>
+                                <ul class="text-xs text-gray-600 mt-1 space-y-0.5">
+                                    <li>Inventory Planner</li>
+                                    <li>Rewize, Stock Perfect</li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Bottom-Right Quadrant (Our Position) -->
+                            <div class="p-4 bg-indigo-50 border-2 border-indigo-400 h-32 md:h-40 relative overflow-hidden">
+                                <div class="absolute -top-10 -right-10 w-24 h-24 bg-indigo-500/20 rounded-full"></div>
+                                <div class="absolute bottom-2 left-2 w-12 h-12 bg-indigo-500/10 rounded-full"></div>
+                                <div class="relative z-10">
+                                    <h5 class="font-bold text-indigo-800">中小企業 / 內部+外部數據</h5>
+                                    <p class="text-xs text-indigo-600 mt-2 font-semibold">我們開創的藍海市場</p>
+                                    <div class="mt-2 inline-flex items-center bg-indigo-600 text-white font-bold text-sm px-3 py-1 rounded-full shadow-lg">
+                                        智慧選品
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Axis Markers -->
+                        <div class="absolute left-8 -bottom-0.5 w-[calc(100%-4rem)] flex justify-between text-xs text-gray-500">
+                            <span>僅內部數據</span>
+                            <span>內部 + 外部數據</span>
+                        </div>
+                        <div class="absolute -left-0.5 top-8 h-[calc(100%-4rem)] flex flex-col-reverse justify-between text-xs text-gray-500">
+                            <span class="transform -rotate-90 origin-bottom-left">中小企業</span>
+                            <span class="transform -rotate-90 origin-top-left">大型企業</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing Section -->
+        <section id="pricing" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h3 class="text-3xl md:text-4xl section-title">選擇適合您的方案</h3>
+                    <p class="mt-4 text-lg text-gray-600">透明的定價，為您事業不同階段的成長提供動力。</p>
+                </div>
+                <div class="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                    <!-- Basic Tier -->
+                    <div class="border border-gray-200 rounded-xl p-8 flex flex-col">
+                        <h4 class="text-2xl font-bold">基礎版</h4>
+                        <p class="mt-2 text-gray-500">適合剛起步的賣家</p>
+                        <p class="mt-6 text-4xl font-bold">NT$ 1,500 <span class="text-lg font-normal text-gray-500">/ 月</span></p>
+                        <ul class="mt-8 space-y-4 text-gray-600 flex-grow">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span>歷史數據分析</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span>有限的趨勢追蹤</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span>Shopify/SHOPLINE 整合</li>
+                        </ul>
+                        <a href="#contact" class="mt-8 w-full text-center bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg cta-button">開始使用</a>
+                    </div>
+                    <!-- Pro Tier -->
+                    <div class="border-2 border-indigo-600 rounded-xl p-8 flex flex-col relative shadow-2xl">
+                        <p class="absolute top-0 -translate-y-1/2 bg-indigo-600 text-white text-sm font-bold px-3 py-1 rounded-full">最受歡迎</p>
+                        <h4 class="text-2xl font-bold">專業版</h4>
+                        <p class="mt-2 text-gray-500">為成長中的電商打造</p>
+                        <p class="mt-6 text-4xl font-bold">NT$ 4,500 <span class="text-lg font-normal text-gray-500">/ 月</span></p>
+                        <ul class="mt-8 space-y-4 text-gray-600 flex-grow">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span><b>基礎版所有功能</b></li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span>完整市場感知 (Dcard/PTT)</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span>跨品類深度分析</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span>價格帶洞察</li>
+                        </ul>
+                        <a href="#contact" class="mt-8 w-full text-center bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg cta-button">選擇專業版</a>
+                    </div>
+                    <!-- Enterprise Tier -->
+                    <div class="border border-gray-200 rounded-xl p-8 flex flex-col">
+                        <h4 class="text-2xl font-bold">企業版</h4>
+                        <p class="mt-2 text-gray-500">針對大型品牌/研究機構</p>
+                        <p class="mt-6 text-4xl font-bold">客製化報價</p>
+                        <ul class="mt-8 space-y-4 text-gray-600 flex-grow">
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span><b>專業版所有功能</b></li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span>AI 顧客反應模擬</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span>API 介接支援</li>
+                            <li class="flex items-center"><span class="text-green-500 mr-2">✔</span>專屬客戶成功經理</li>
+                        </ul>
+                        <a href="#contact" class="mt-8 w-full text-center bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg cta-button">聯絡我們</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Team Section -->
+        <section id="team" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h3 class="text-3xl md:text-4xl section-title">驅動創新的跨領域團隊</h3>
+                    <p class="mt-4 text-lg text-gray-600">我們集結商業策略、AI 技術與產品思維，致力於用數據重塑零售的未來。</p>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-6 gap-y-12">
+                    <!-- Team Member -->
+                    <div class="text-center">
+                        <img src="https://raw.githubusercontent.com/hctsai1006/hctsai1006.github.io/main/consumer-verse/%E9%BB%83%E5%8B%A4%E5%80%AB.png" class="w-32 h-32 rounded-full mx-auto mb-4 shadow-lg object-cover" alt="黃勤倫">
+                        <h5 class="text-lg font-bold">黃勤倫</h5>
+                        <p class="text-indigo-600 font-semibold">創辦人 & CEO</p>
+                    </div>
+                     <!-- Team Member -->
+                    <div class="text-center">
+                        <img src="https://raw.githubusercontent.com/hctsai1006/hctsai1006.github.io/main/consumer-verse/%E9%99%B3%E5%AE%89%E6%A5%B7.png" class="w-32 h-32 rounded-full mx-auto mb-4 shadow-lg object-cover" alt="陳安楷">
+                        <h5 class="text-lg font-bold">陳安楷</h5>
+                        <p class="text-indigo-600 font-semibold">共同創辦人 & CTO</p>
+                    </div>
+                     <!-- Team Member -->
+                    <div class="text-center">
+                        <img src="https://raw.githubusercontent.com/hctsai1006/hctsai1006.github.io/main/consumer-verse/%E7%8E%8B%E8%8A%B7%E7%AB%AF.png" class="w-32 h-32 rounded-full mx-auto mb-4 shadow-lg object-cover" alt="王芷端">
+                        <h5 class="text-lg font-bold">王芷端</h5>
+                        <p class="text-indigo-600 font-semibold">共同創辦人 & CPO</p>
+                    </div>
+                     <!-- Team Member -->
+                    <div class="text-center">
+                        <img src="https://raw.githubusercontent.com/hctsai1006/hctsai1006.github.io/main/consumer-verse/%E6%96%B9%E4%BB%A5%E4%BD%B3.png" class="w-32 h-32 rounded-full mx-auto mb-4 shadow-lg object-cover" alt="方以佳">
+                        <h5 class="text-lg font-bold">方以佳</h5>
+                        <p class="text-indigo-600 font-semibold">AI 策略 & 數據科學</p>
+                    </div>
+                    <!-- Team Member -->
+                    <div class="text-center">
+                        <img src="https://raw.githubusercontent.com/hctsai1006/hctsai1006.github.io/main/consumer-verse/%E8%94%A1%E7%A7%80%E5%90%89.png" class="w-32 h-32 rounded-full mx-auto mb-4 shadow-lg object-cover" alt="蔡秀吉">
+                        <h5 class="text-lg font-bold">蔡秀吉</h5>
+                        <p class="text-indigo-600 font-semibold">AI 工程師 (NLP)</p>
+                    </div>
+                     <!-- Team Member -->
+                    <div class="text-center">
+                        <img src="https://raw.githubusercontent.com/hctsai1006/hctsai1006.github.io/main/consumer-verse/%E5%BB%96%E5%AD%90%E5%A9%B7.png" class="w-32 h-32 rounded-full mx-auto mb-4 shadow-lg object-cover" alt="廖子婷">
+                        <h5 class="text-lg font-bold">廖子婷</h5>
+                        <p class="text-indigo-600 font-semibold">數據分析師</p>
+                    </div>
+                     <!-- Team Member -->
+                    <div class="text-center">
+                        <img src="https://raw.githubusercontent.com/hctsai1006/hctsai1006.github.io/main/consumer-verse/%E6%9E%97%E4%BE%91%E8%BE%B0.png" class="w-32 h-32 rounded-full mx-auto mb-4 shadow-lg object-cover" alt="林侑辰">
+                        <h5 class="text-lg font-bold">林侑辰</h5>
+                        <p class="text-indigo-600 font-semibold">財務與法務顧問</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="bg-indigo-700 text-white rounded-2xl p-8 md:p-16 text-center">
+                    <h3 class="text-3xl md:text-4xl font-bold section-title">準備好用數據驅動您的成長了嗎？</h3>
+                    <p class="mt-4 text-lg text-indigo-200 max-w-2xl mx-auto">立即預約免費的產品演示，我們將向您展示「智慧選品」如何為您的業務帶來變革。無需任何技術背景，讓我們一起開啟您的智慧決策之旅。</p>
+                    <div class="mt-10">
+                         <a href="mailto:contact@smartselection.ai" class="bg-white text-indigo-600 font-bold py-3 px-8 rounded-lg text-lg cta-button">立即預約演示</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-400">
+            <p>&copy; 2024 智慧選品 (ConsumerVerse Inc.) 版權所有。</p>
+            <p class="text-sm mt-2">我們承諾 100% 遵守台灣《個人資料保護法》，您的數據安全是我們的第一要務。</p>
+        </div>
+    </footer>
+
+</body>
+</html>
