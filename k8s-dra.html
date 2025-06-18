@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes 資源管理的典範轉移：深入動態資源分配 (DRA)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #f8fafc; /* Tailwind gray-50 */
+        }
+        .gradient-text {
+            background: linear-gradient(to right, #00509D, #48BFE3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .flowchart-node {
+            border: 2px solid #0096C7;
+            background-color: #CAF0F8;
+            color: #00509D;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            text-align: center;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .flowchart-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #0096C7;
+            font-weight: bold;
+        }
+        .pyramid-layer {
+            clip-path: polygon(25% 0%, 75% 0%, 100% 100%, 0% 100%);
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            padding: 1.5rem 2rem;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Color Palette: Brilliant Blues (#00509D, #0096C7, #48BFE3, #ADE8F4, #CAF0F8) -->
+    <!-- NEITHER Mermaid JS NOR SVG were used in this output. -->
+
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-6xl font-black mb-4 gradient-text">Kubernetes 資源管理的典範轉移</h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">從靜態插件到動態意圖：動態資源分配 (DRA) 如何重塑 Kubernetes 的異構計算</p>
+        </header>
+
+        <main class="space-y-12">
+
+            <!-- Section 1: The Tipping Point -->
+            <section class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-center mb-8 text-[#00509D]">挑戰的開端：當硬體超越了抽象</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-xl font-bold mb-4">失真的抽象模型</h3>
+                        <p class="mb-6 text-gray-700">隨著 AI/ML 與 5G 等工作負載的興起，對 GPU、FPGA 等異構硬體的需求激增。然而，Kubernetes 最初的 Device Plugin 框架將複雜的硬體簡化為一個不透明的整數計數器，這種「失真壓縮」丟失了關鍵的配置、拓撲和共享資訊，導致嚴重的效率瓶頸和管理困境。</p>
+                        <ul class="space-y-3">
+                            <li class="flex items-start"><span class="text-blue-500 mr-3 text-xl">🚫</span><div><strong class="text-[#00509D]">缺乏參數：</strong>無法請求「記憶體 > 40GB」的 GPU。</div></li>
+                            <li class="flex items-start"><span class="text-blue-500 mr-3 text-xl">🚫</span><div><strong class="text-[#00509D]">拓撲無知：</strong>無法感知 GPU 之間的 NVLink 連接。</div></li>
+                            <li class="flex items-start"><span class="text-blue-500 mr-3 text-xl">🚫</span><div><strong class="text-[#00509D]">無原生共享：</strong>無法在 Pod 間安全地共享昂貴的 GPU。</div></li>
+                        </ul>
+                    </div>
+                    <div class="chart-container h-64 md:h-80 max-w-md">
+                        <canvas id="inefficiencyChart"></canvas>
+                        <p class="text-center mt-2 text-sm text-gray-500">Device Plugin 的限制導致了資源的次優化分配。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 2: The Paradigm Shift -->
+            <section class="bg-[#00509D] text-white rounded-lg shadow-lg p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-center mb-8">典範轉移：從指令式到宣告式意圖</h2>
+                <p class="text-center max-w-3xl mx-auto mb-10 text-lg text-gray-200">動態資源分配 (DRA) 徹底改變了遊戲規則。它用一個靈活、感知叢集狀態且完全宣告式的 API，取代了過去僵化、僅限於節點本地的記帳機制，讓應用程式可以真正表達其資源「意圖」。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-white/10 p-6 rounded-lg">
+                        <h3 class="text-2xl font-bold mb-4 text-center">指令式 (Device Plugin)</h3>
+                        <p class="mb-4 text-center font-mono bg-white/20 p-2 rounded">`nvidia.com/gpu: 1`</p>
+                        <ul class="list-disc list-inside space-y-2 text-gray-300">
+                            <li><strong>WHAT:</strong> 一個通用的 GPU。</li>
+                            <li><strong>HOW:</strong> 依賴節點標籤、註解、自訂 Webhook 和排程器來實現特定需求。</li>
+                            <li><strong>RESULT:</strong> 脆弱、複雜、難以維護的「補丁」式架構。</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white/10 p-6 rounded-lg border-2 border-[#48BFE3]">
+                        <h3 class="text-2xl font-bold mb-4 text-center">宣告式 (DRA)</h3>
+                        <p class="mb-4 text-center font-mono bg-white/20 p-2 rounded">`ResourceClaim`</p>
+                        <ul class="list-disc list-inside space-y-2 text-gray-300">
+                             <li><strong>WHAT:</strong> 一個記憶體 > 40GB 且支援 MIG 的 GPU。</li>
+                             <li><strong>HOW:</strong> 將需求委託給 Kubernetes 控制平面（排程器 + DRA 驅動程式）去實現。</li>
+                             <li><strong>RESULT:</strong> 原生、一致、可擴展的意圖驅動自動化。</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 3: DRA Workflow -->
+            <section class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-center mb-8 text-[#00509D]">DRA 核心工作流程</h2>
+                 <p class="text-center max-w-3xl mx-auto mb-10 text-gray-600">DRA 借鑒了成熟的 PV/PVC 模型，透過 `ResourceClaim`, `ResourceSlice` 和 `DeviceClass` 的協同運作，實現了一個解耦且生命週期明確的資源分配過程。</p>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+                    <div class="flowchart-node">1. 開發者<br>提交 Pod 與 ResourceClaim</div>
+                    <div class="flowchart-arrow">→</div>
+                    <div class="flowchart-node">2. 排程器<br>讀取 Claim，尋找匹配的 ResourceSlice</div>
+                    <div class="flowchart-arrow">→</div>
+                    <div class="flowchart-node">3. 分配<br>將 Pod 調度到擁有合適硬體的節點</div>
+                </div>
+                <div class="flex justify-center my-4">
+                    <div class="flowchart-arrow transform -rotate-90 md:rotate-90">↓</div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4 items-center flex-row-reverse">
+                     <div class="flowchart-node">5. DRA 驅動程式<br>配置硬體並注入容器</div>
+                     <div class="flowchart-arrow">←</div>
+                     <div class="flowchart-node">4. Kubelet<br>在節點上觸發驅動程式</div>
+                     <div class="hidden md:block flowchart-arrow"></div>
+                     <div class="hidden md:block"></div>
+                </div>
+            </section>
+
+
+            <!-- Section 4: Use Cases -->
+            <section>
+                <h2 class="text-3xl font-bold text-center mb-8 text-[#00509D]">DRA 實踐：釋放異構硬體全部潛力</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- GPU Management -->
+                    <div class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+                        <h3 class="text-2xl font-bold mb-2 text-center">加速器資源管理</h3>
+                        <p class="text-center text-gray-600 mb-6">DRA 為 GPU 共享提供了原生的、宣告式的解決方案，極大提升了資源利用率。</p>
+                        <div class="chart-container h-80 max-w-lg">
+                            <canvas id="gpuSharingChart"></canvas>
+                        </div>
+                        <p class="mt-4 text-gray-700">透過在 `DeviceClass` 中定義共享策略，開發者可以透明地請求到 MIG 分割區、啟用 MPS 的共享 GPU 或時間分片資源，而無需關心底層實現的複雜性。這使得單一昂貴的 GPU 能夠安全、高效地服務於多個不同的工作負載。</p>
+                    </div>
+
+                    <!-- Network Management -->
+                    <div class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+                        <h3 class="text-2xl font-bold mb-2 text-center">網路資源管理</h3>
+                        <p class="text-center text-gray-600 mb-6">借助 KEP-5075，DRA 將頻寬變為可被排程器核算的「可消耗容量」，實現了真正的網路 QoS。</p>
+                        <div class="chart-container h-80 max-w-lg">
+                            <canvas id="networkQosChart"></canvas>
+                        </div>
+                         <p class="mt-4 text-gray-700">此圖展示了一張 10Gbps 的網卡容量如何被多個 Pod 宣告式地消耗。排程器會進行資源會計，確保總請求量不超過可用容量，從而為需要穩定網路效能的應用提供了前所未有的保證。</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: The Bigger Picture -->
+            <section class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+                <h2 class="text-3xl font-bold text-center mb-8 text-[#00509D]">宏觀視野：架構哲學的演進</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4">從 IaC 到 CaD</h3>
+                        <p class="mb-6 text-gray-700">DRA 的出現是從「基礎設施即程式碼」(IaC) 向「組態即資料」(CaD) 哲學演進的體現。它將焦點從「如何做」的指令式腳本，轉移到「是什麼」的宣告式資料模型，由系統的調節迴路負責實現最終狀態。</p>
+                        
+                        <h3 class="text-2xl font-bold mb-4 mt-8">微觀與宏觀的協同</h3>
+                        <p class="text-gray-700">DRA 作為微觀協調器，負責 Pod 層級的硬體分配；而像 Nephio 這樣的宏觀協調器，則負責跨越多個叢集的服務意圖。兩者可以在一個統一的宣告式堆疊中協同工作，構成從高階業務意圖到底層硬體實現的完整自動化鏈條。</p>
+                    </div>
+                    <div class="w-full h-96 flex items-center justify-center">
+                        <div class="relative w-full max-w-sm h-full">
+                           <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-24 pyramid-layer bg-[#00509D]">高層意圖 (Nephio)</div>
+                           <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[85%] h-24 pyramid-layer bg-[#0096C7]">資源宣告 (DRA)</div>
+                           <div class="absolute top-40 left-1/2 -translate-x-1/2 w-[70%] h-24 pyramid-layer bg-[#48BFE3]">實現機制 (SR-IOV, eBPF)</div>
+                           <div class="absolute top-60 left-1/2 -translate-x-1/2 w-[55%] h-24 pyramid-layer bg-[#ADE8F4] !text-[#00509D]">硬體資源 (GPU, IPU)</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 6: Conclusion -->
+            <footer class="text-center mt-16 py-8 border-t-2 border-[#0096C7]">
+                <h2 class="text-3xl md:text-4xl font-black mb-4 gradient-text">一個由應用需求驅動的未來</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">DRA 為 Kubernetes 奠定了駕馭未來複雜硬體的統一、可擴展且面向未來的基礎。這一根本性的轉變，將確保 Kubernetes 在 AI、HPC 和 5G 定義的下一個運算十年中，繼續保持其領先地位，實現一個真正由「應用需求」驅動資源調度的、更具彈性與自動化的未來。</p>
+            </footer>
+
+        </main>
+    </div>
+
+    <script>
+        // Helper function for label wrapping
+        function wrapLabel(label, maxWidth) {
+            const words = label.split(' ');
+            let lines = [];
+            let currentLine = words[0];
+
+            for (let i = 1; i < words.length; i++) {
+                if ((currentLine + ' ' + words[i]).length > maxWidth) {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                } else {
+                    currentLine += ' ' + words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        const tooltipTitleCallback = {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                              return label.join(' ');
+                            } else {
+                              return label;
+                            }
+                        }
+                    }
+                },
+                legend: {
+                    position: 'top',
+                }
+            }
+        };
+        
+        const palette = {
+            blueDark: '#00509D',
+            blueMid: '#0096C7',
+            blueLight: '#48BFE3',
+            blueLighter: '#ADE8F4',
+            blueLightest: '#CAF0F8'
+        };
+
+        // Chart 1: Inefficiency Chart
+        const inefficiencyCtx = document.getElementById('inefficiencyChart').getContext('2d');
+        new Chart(inefficiencyCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['資源浪費與管理開銷', '有效利用'],
+                datasets: [{
+                    label: '資源利用率',
+                    data: [35, 65],
+                    backgroundColor: [
+                        palette.blueLight,
+                        palette.blueDark,
+                    ],
+                    borderColor: '#f8fafc',
+                    borderWidth: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: tooltipTitleCallback.plugins
+            }
+        });
+        
+        // Chart 2: GPU Sharing Chart
+        const gpuSharingCtx = document.getElementById('gpuSharingChart').getContext('2d');
+        new Chart(gpuSharingCtx, {
+            type: 'bar',
+            data: {
+                labels: ['完整 GPU', 'MIG (硬體隔離)', wrapLabel('MPS (進程共享)', 16), wrapLabel('時間分片 (Time Slicing)', 16)],
+                datasets: [{
+                    label: '隔離性',
+                    data: [10, 9, 5, 4],
+                    backgroundColor: palette.blueDark,
+                }, {
+                    label: '共享粒度',
+                    data: [1, 8, 9, 9],
+                    backgroundColor: palette.blueLight,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        stacked: true,
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '相對評分 (越高越優)'
+                        }
+                    }
+                },
+                plugins: tooltipTitleCallback.plugins
+            }
+        });
+
+        // Chart 3: Network QoS Chart
+        const networkQosCtx = document.getElementById('networkQosChart').getContext('2d');
+        new Chart(networkQosCtx, {
+            type: 'bar',
+            data: {
+                labels: ['10Gbps 實體網卡'],
+                datasets: [
+                    {
+                        label: 'Pod A (請求 4Gbps)',
+                        data: [4],
+                        backgroundColor: palette.blueDark,
+                    },
+                    {
+                        label: 'Pod B (請求 3Gbps)',
+                        data: [3],
+                        backgroundColor: palette.blueMid,
+                    },
+                    {
+                        label: 'Pod C (請求 2Gbps)',
+                        data: [2],
+                        backgroundColor: palette.blueLight,
+                    },
+                     {
+                        label: '剩餘可用頻寬',
+                        data: [1],
+                        backgroundColor: palette.blueLightest,
+                    }
+                ]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        stacked: true,
+                        max: 10,
+                         title: {
+                            display: true,
+                            text: '頻寬 (Gbps)'
+                        }
+                    },
+                    y: {
+                        stacked: true
+                    }
+                },
+                 plugins: tooltipTitleCallback.plugins
+            }
+        });
+    </script>
+</body>
+</html>
