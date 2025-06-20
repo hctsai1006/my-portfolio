@@ -1,393 +1,375 @@
-import React, { useState, useEffect } from 'react';
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沃龍工業機隊智慧聯網戰略</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        /* 淡入動畫 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-200 flex items-center justify-center min-h-screen p-4">
 
-// Helper component for icons used in the presentation
-const Icon = ({ name, className }) => {
-  const icons = {
-    chevronLeft: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m15 18-6-6 6-6" /></svg>
-    ),
-    chevronRight: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="m9 18 6-6-6-6" /></svg>
-    ),
-    zap: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>
-    ),
-    target: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>
-    ),
-    settings: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>
-    ),
-    trendingUp: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" /></svg>
-    ),
-    server: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect width="20" height="8" x="2" y="2" rx="2" ry="2" /><rect width="20" height="8" x="2" y="14" rx="2" ry="2" /><line x1="6" x2="6.01" y1="6" y2="6" /><line x1="6" x2="6.01" y1="18" y2="18" /></svg>
-    ),
-    route: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><circle cx="6" cy="19" r="3" /><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" /><circle cx="18" cy="5" r="3" /></svg>
-    ),
-     barChart: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><line x1="12" x2="12" y1="20" y2="10" /><line x1="18" x2="18" y1="20" y2="4" /><line x1="6" x2="6" y1="20" y2="16" /></svg>
-    ),
-    database: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v14a9 3 0 0 0 18 0V5" /><path d="M3 12a9 3 0 0 0 18 0" /></svg>
-    ),
-    rocket: (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.3.0-3.1-.73-.84-2.3-.8-3.1.05z"/><path d="m12 15-3-3a9 9 0 0 1 3-13v0c0 3.6 2.7 6.3 6 6v0a9 9 0 0 1-13 3l-3 3"/></svg>
-    ),
-    network: (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg>
-    )
-  }
-  return icons[name] || null
-}
+    <div class="w-full max-w-6xl aspect-video relative">
+        <!-- Slide container -->
+        <div id="slide-container" class="w-full h-full"></div>
 
-// Main slide component
-const Slide = ({ title, content, slideNumber, totalSlides }) => {
-  return (
-    <div className="w-full h-full bg-white rounded-lg shadow-xl flex flex-col p-8 md:p-12 animate-fadeIn">
-      <div className="flex-grow flex flex-col justify-center">
-        <h1 className="text-3xl md:text-5xl font-bold text-gray-800 mb-6 text-center">{title}</h1>
-        <div className="text-lg md:text-xl text-gray-600 space-y-4 leading-relaxed">
-          {content}
-        </div>
-      </div>
-       <div className="text-right text-sm text-gray-400 mt-4">
-          {slideNumber} / {totalSlides}
-      </div>
+        <!-- Navigation Buttons -->
+        <button id="prev-btn" class="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-12 bg-white/50 hover:bg-white rounded-full p-2 transition-all duration-300 shadow-md" aria-label="上一張投影片">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-gray-700"><path d="m15 18-6-6 6-6" /></svg>
+        </button>
+        <button id="next-btn" class="absolute top-1/2 -translate-y-1/2 right-0 translate-x-12 bg-white/50 hover:bg-white rounded-full p-2 transition-all duration-300 shadow-md" aria-label="下一張投影片">
+             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-gray-700"><path d="m9 18 6-6-6-6" /></svg>
+        </button>
     </div>
-  )
-}
 
-// The main App component that manages the presentation
-export default function App() {
-  const [currentSlide, setCurrentSlide] = useState(0)
+    <script>
+        // --- Data for Slides and Icons ---
 
-  // Define the content for each slide
-  const slides = [
-    {
-      title: '沃龍工業機隊智慧聯網戰略',
-      content: (
-        <div className="text-center">
-          <p className="text-2xl text-slate-700">從硬體供應商到數據驅動的平台服務商轉型計畫</p>
-          <div className="mt-12">
-            <Icon name="rocket" className="w-24 h-24 text-blue-500 mx-auto" />
-          </div>
-          <p className="mt-8 text-lg text-gray-500">沃龍工業股份有限公司</p>
-          <p className="text-sm text-gray-400">2025年6月</p>
-        </div>
-      )
-    },
-    {
-      title: '摘要：為何推動聯網？',
-      content: (
-        <ul className="space-y-6 list-disc list-inside">
-          <li><span className="font-semibold text-blue-600">打破數據孤島：</span>將分散的CNC加工機台連接成一個智慧網絡，釋放數據的指數級價值。</li>
-          <li><span className="font-semibold text-blue-600">戰略轉型：</span>從銷售高價值的「智慧刀把」硬體，演進為提供數據驅動的綜合解決方案與服務平台。</li>
-          <li><span className="font-semibold text-blue-600">核心目標：</span>透過中央儀表板實現統一監控、遙測與資源優化，為客戶創造可量化的商業效益。</li>
-        </ul>
-      )
-    },
-    {
-      title: '關於沃龍工業：深度科技驅動',
-      content: (
-        <div className="grid md:grid-cols-2 gap-8 items-center">
-          <div>
-            <ul className="space-y-4 list-disc list-inside">
-                <li><span className="font-semibold">學術淵源：</span>源自中正大學的學生創業團隊，具備深厚的研發實力。</li>
-                <li><span className="font-semibold">核心產品：</span>AI智慧刀把，整合高精度感測器與AI演算法。</li>
-                <li><span className="font-semibold">關鍵技術：</span>以94.2%的準確率預測刀具剩餘使用壽命 (RUL)。</li>
-                <li><span className="font-semibold">目標市場：</span>鎖定對精度要求極高的航太與半導體產業。</li>
-            </ul>
-          </div>
-          <div className="p-6 bg-slate-100 rounded-lg text-center">
-             <img src="https://placehold.co/400x250/E2E8F0/475569?text=AI+Smart+Tool+Holder" alt="AI智慧刀把示意圖" className="rounded-md mx-auto shadow-md" />
-             <p className="mt-4 text-sm font-semibold text-slate-700">即時監控、預測性維護、自動停機</p>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: '挑戰：數據孤島的困境',
-      content: (
-        <div className="text-center space-y-8">
-            <p>當前的機隊運營模式，每台機台都像一座孤立的島嶼。</p>
-            <div className="grid md:grid-cols-3 gap-6">
-                <div className="p-6 bg-amber-100 rounded-lg shadow">
-                    <h3 className="font-bold text-amber-800 text-xl mb-2">缺乏統一監控</h3>
-                    <p className="text-amber-700">無法即時掌握全廠設備的整體狀態與效率。</p>
-                </div>
-                 <div className="p-6 bg-red-100 rounded-lg shadow">
-                    <h3 className="font-bold text-red-800 text-xl mb-2">被動式維護</h3>
-                    <p className="text-red-700">依賴經驗判斷或故障後維修，成本高昂且風險大。</p>
-                </div>
-                 <div className="p-6 bg-gray-100 rounded-lg shadow">
-                    <h3 className="font-bold text-gray-800 text-xl mb-2">優化困難</h3>
-                    <p className="text-gray-700">無法進行跨機台的製程比較與資源最佳化調度。</p>
-                </div>
-            </div>
-        </div>
-      )
-    },
-    {
-      title: '數據採集策略：我們要收集什麼？',
-      content: (
-        <div className="grid md:grid-cols-2 gap-8">
-            <div className="p-6 border-l-4 border-blue-500 bg-blue-50 rounded-r-lg">
-                <h3 className="text-2xl font-bold text-blue-800 mb-3">沃龍核心指標 (高價值數據)</h3>
-                <ul className="space-y-2 list-disc list-inside text-blue-700">
-                    <li>預測剩餘使用壽命 (RUL)</li>
-                    <li>即時刀具磨耗狀態</li>
-                    <li>原始振動/聲學訊號</li>
-                    <li>異常加工事件標記</li>
-                </ul>
-            </div>
-            <div className="p-6 border-l-4 border-slate-500 bg-slate-50 rounded-r-lg">
-                <h3 className="text-2xl font-bold text-slate-800 mb-3">CNC擴展指標 (情境關聯數據)</h3>
-                <ul className="space-y-2 list-disc list-inside text-slate-700">
-                    <li>機台操作狀態 (運行/閒置/警報)</li>
-                    <li>主軸轉速與負載</li>
-                    <li>各軸負載與進給速率</li>
-                    <li>警報號碼與訊息</li>
-                    <li>能源消耗</li>
-                </ul>
-            </div>
-        </div>
-      )
-    },
-    {
-      title: '數據融合的價值：數位孿生',
-      content: (
-          <div className="text-center">
-            <p className="mb-8">單一數據點價值有限，真正的智慧來自於數據融合。</p>
-            <div className="flex justify-center items-center space-x-4 text-2xl font-semibold">
-                <div className="p-4 bg-blue-100 rounded-lg">刀具振動數據</div>
-                <div className="text-blue-500">+</div>
-                <div className="p-4 bg-slate-100 rounded-lg">主軸負載數據</div>
-                <div className="text-blue-500">=</div>
-                <div className="p-4 bg-green-100 rounded-lg text-green-800">高保真度的數位孿生</div>
-            </div>
-             <p className="mt-8">我們建立的不僅是監控系統，而是一個能反映真實加工場景的<strong className="font-bold text-gray-800">數位鏡像</strong>，實現從「被動監控」到「主動模擬與優化」的跨越。</p>
-          </div>
-      )
-    },
-    {
-      title: 'IIoT架構：硬體與無線通訊',
-      content: (
-        <div className="space-y-6">
-            <h3 className="text-2xl font-bold text-center">雙層無線網路策略</h3>
-            <div className="grid md:grid-cols-2 gap-6">
-                <div className="p-6 bg-blue-100 rounded-lg text-center shadow-md">
-                    <h4 className="text-xl font-bold text-blue-800">主要骨幹：私有5G</h4>
-                    <p className="mt-2 text-blue-700">提供高可靠、低延遲、高安全的關鍵數據傳輸，與中華電信5G加速器合作基礎相契合。</p>
-                </div>
-                 <div className="p-6 bg-teal-100 rounded-lg text-center shadow-md">
-                    <h4 className="text-xl font-bold text-teal-800">輔助網路：LoRaWAN</h4>
-                    <p className="mt-2 text-teal-700">低成本、低功耗連接溫濕度、液位等輔助感測器，豐富數據維度。</p>
-                </div>
-            </div>
-             <div className="p-6 bg-slate-100 rounded-lg shadow-md">
-                <h4 className="text-xl font-bold text-slate-800 text-center">機邊硬體：工業級邊緣閘道</h4>
-                <p className="mt-2 text-slate-700 text-center">在每台機台旁部署強固型工業電腦 (IPC)，負責即時數據預處理、AI模型推論、協議轉換與數據緩存。</p>
-            </div>
-        </div>
-      )
-    },
-    {
-      title: 'IIoT架構：軟體與通訊協議',
-      content: (
-        <div className="text-center">
-            <p className="text-2xl font-semibold mb-8">標準化數據流：從機台到平台</p>
-            <div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
-                <div className="p-4 rounded-lg bg-gray-200 w-full md:w-auto text-center">
-                    <h4 className="font-bold">FANUC / Siemens</h4>
-                    <p className="text-sm">原生API (FOCAS/SDK)</p>
-                </div>
-                 <Icon name="chevronRight" className="w-8 h-8 text-gray-500 hidden md:block" />
-                <div className="p-4 rounded-lg bg-blue-200 w-full md:w-auto text-center">
-                     <h4 className="font-bold">MTConnect 適配器</h4>
-                     <p className="text-sm">統一數據格式</p>
-                </div>
-                 <Icon name="chevronRight" className="w-8 h-8 text-gray-500 hidden md:block" />
-                 <div className="p-4 rounded-lg bg-teal-200 w-full md:w-auto text-center">
-                     <h4 className="font-bold">MQTT / 5G</h4>
-                     <p className="text-sm">安全可靠傳輸</p>
-                </div>
-                 <Icon name="chevronRight" className="w-8 h-8 text-gray-500 hidden md:block" />
-                 <div className="p-4 rounded-lg bg-green-200 w-full md:w-auto text-center">
-                     <h4 className="font-bold">中央數據平台</h4>
-                     <p className="text-sm">儲存、分析、視覺化</p>
-                </div>
-            </div>
-            <p className="mt-8">此架構實現了中央平台與特定機台型號的<strong className="font-bold text-gray-800">解耦</strong>，是實現大規模、異構機隊管理的關鍵。</p>
-        </div>
-      )
-    },
-    {
-      title: '可量化的商業價值',
-      content: (
-         <div className="grid md:grid-cols-2 gap-6">
-            <div className="flex items-start space-x-4 p-4">
-                <Icon name="zap" className="w-12 h-12 text-blue-500 flex-shrink-0 mt-1" />
-                <div>
-                    <h3 className="text-xl font-bold">預測性維護</h3>
-                    <p>大幅減少非計畫性停機，避免災難性故障。</p>
-                </div>
-            </div>
-             <div className="flex items-start space-x-4 p-4">
-                <Icon name="target" className="w-12 h-12 text-green-500 flex-shrink-0 mt-1" />
-                <div>
-                    <h3 className="text-xl font-bold">製程與品質優化</h3>
-                    <p>透過「黃金運行曲線」比對，降低廢品率。</p>
-                </div>
-            </div>
-             <div className="flex items-start space-x-4 p-4">
-                <Icon name="trendingUp" className="w-12 h-12 text-amber-500 flex-shrink-0 mt-1" />
-                <div>
-                    <h3 className="text-xl font-bold">OEE 提升</h3>
-                    <p>即時計算稼動率、性能、品質，定位生產瓶頸。</p>
-                </div>
-            </div>
-             <div className="flex items-start space-x-4 p-4">
-                <Icon name="settings" className="w-12 h-12 text-teal-500 flex-shrink-0 mt-1" />
-                <div>
-                    <h3 className="text-xl font-bold">能源效率</h3>
-                    <p>識別能源浪費環節，降低營運成本，貢獻ESG目標。</p>
-                </div>
-            </div>
-         </div>
-      )
-    },
-    {
-      title: '中央數據平台架構建議',
-      content: (
-        <div className="grid md:grid-cols-2 gap-8">
-            <div className="p-6 bg-slate-100 rounded-lg">
-                <Icon name="database" className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-slate-800 text-center mb-3">後端 (Backend)</h3>
-                <p className="text-center font-semibold text-xl text-blue-600">InfluxDB</p>
-                <p className="text-center text-slate-600 mt-2">業界領先的開源<strong className="font-bold text-slate-700">時間序列資料庫</strong>，專為高吞吐量的工業數據寫入與即時查詢而設計。</p>
-            </div>
-            <div className="p-6 bg-slate-100 rounded-lg">
-                 <Icon name="barChart" className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                <h3 className="text-2xl font-bold text-slate-800 text-center mb-3">前端 (Frontend)</h3>
-                <p className="text-center font-semibold text-xl text-orange-500">Grafana</p>
-                <p className="text-center text-slate-600 mt-2">專為時間序列數據設計的開源<strong className="font-bold text-slate-700">視覺化儀表板</strong>，可高度客製化，完美整合InfluxDB。</p>
-            </div>
-        </div>
-      )
-    },
-    {
-      title: '三階段實施路徑圖',
-      content: (
-          <div className="relative">
-              <div className="border-l-2 border-blue-300 absolute h-full top-0 left-4"></div>
-              <div className="space-y-8">
-                  <div className="pl-12 relative">
-                      <div className="absolute top-1 left-0 bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">1</div>
-                      <h3 className="text-xl font-bold text-blue-700">第一階段：先導部署與驗證 (3個月)</h3>
-                      <p>選擇2-5台代表性機台，驗證端到端數據通路，建立PoC儀表板。</p>
-                  </div>
-                  <div className="pl-12 relative">
-                      <div className="absolute top-1 left-0 bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">2</div>
-                      <h3 className="text-xl font-bold text-blue-700">第二階段：規模化推廣 (3-12個月)</h3>
-                      <p>設計標準化「IIoT連接套件」，分批次將方案推廣至客戶所有機台。</p>
-                  </div>
-                  <div className="pl-12 relative">
-                      <div className="absolute top-1 left-0 bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">3</div>
-                      <h3 className="text-xl font-bold text-blue-700">第三階段：進階分析與整合 (持續進行)</h3>
-                      <p>開發複雜AI模型，與MES/ERP系統整合，將數據價值最大化。</p>
-                  </div>
-              </div>
-          </div>
-      )
-    },
-    {
-      title: '戰略轉型：創造新商業模式',
-      content: (
-          <div className="text-center">
-            <p className="text-2xl font-semibold mb-8">此專案將驅動沃龍的商業模式根本性轉型</p>
-            <div className="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8">
-                <div className="p-6 rounded-lg bg-gray-100 w-full md:w-1/3">
-                    <h4 className="font-bold text-xl">從「賣刀把」</h4>
-                    <p className="text-sm">一次性硬體銷售</p>
-                </div>
-                <div className="text-3xl font-bold text-blue-500">&rarr;</div>
-                 <div className="p-6 rounded-lg bg-green-100 w-full md:w-1/3">
-                    <h4 className="font-bold text-xl text-green-800">到「賣成果」</h4>
-                    <p className="text-sm text-green-700">OEE提升保證、成本降低服務</p>
-                </div>
-            </div>
-            <p className="mt-8">透過提供基於SaaS的訂閱制服務，建立<strong className="font-bold text-green-700">經常性收入流 (Recurring Revenue)</strong>，並以數據和演算法構建難以超越的<strong className="font-bold text-gray-800">護城河</strong>。</p>
-          </div>
-      )
-    },
-    {
-      title: 'Q&A',
-      content: (
-        <div className="text-center">
-          <h2 className="text-6xl font-bold text-gray-800">感謝聆聽</h2>
-          <p className="text-3xl text-gray-600 mt-4">問答環節</p>
-        </div>
-      )
-    }
-  ]
-  
-  const totalSlides = slides.length
+        const icons = {
+            chevronLeft: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6" /></svg>`,
+            chevronRight: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></svg>`,
+            zap: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>`,
+            target: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>`,
+            settings: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l-.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" /><circle cx="12" cy="12" r="3" /></svg>`,
+            trendingUp: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17" /><polyline points="16 7 22 7 22 13" /></svg>`,
+            barChart: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="20" y2="10" /><line x1="18" x2="18" y1="20" y2="4" /><line x1="6" x2="6" y1="20" y2="16" /></svg>`,
+            database: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M3 5v14a9 3 0 0 0 18 0V5" /><path d="M3 12a9 3 0 0 0 18 0" /></svg>`,
+            rocket: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.3.0-3.1-.73-.84-2.3-.8-3.1.05z"/><path d="m12 15-3-3a9 9 0 0 1 3-13v0c0 3.6 2.7 6.3 6 6v0a9 9 0 0 1-13 3l-3 3"/></svg>`,
+        };
 
-  const goToNextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % totalSlides)
-  }
+        const slides = [
+            {
+                title: '沃龍工業機隊智慧聯網戰略',
+                content: `
+                    <div class="text-center">
+                        <p class="text-2xl text-slate-700">從硬體供應商到數據驅動的平台服務商轉型計畫</p>
+                        <div class="mt-12 w-24 h-24 text-blue-500 mx-auto">${icons.rocket}</div>
+                        <p class="mt-8 text-lg text-gray-500">沃龍工業股份有限公司</p>
+                        <p class="text-sm text-gray-400">2025年6月</p>
+                    </div>
+                `
+            },
+            {
+                title: '摘要：為何推動聯網？',
+                content: `
+                    <ul class="space-y-6 list-disc list-inside">
+                        <li><span class="font-semibold text-blue-600">打破數據孤島：</span>將分散的CNC加工機台連接成一個智慧網絡，釋放數據的指數級價值。</li>
+                        <li><span class="font-semibold text-blue-600">戰略轉型：</span>從銷售高價值的「智慧刀把」硬體，演進為提供數據驅動的綜合解決方案與服務平台。</li>
+                        <li><span class="font-semibold text-blue-600">核心目標：</span>透過中央儀表板實現統一監控、遙測與資源優化，為客戶創造可量化的商業效益。</li>
+                    </ul>
+                `
+            },
+            {
+                title: '關於沃龍工業：深度科技驅動',
+                content: `
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <ul class="space-y-4 list-disc list-inside">
+                                <li><span class="font-semibold">學術淵源：</span>源自中正大學的學生創業團隊，具備深厚的研發實力。</li>
+                                <li><span class="font-semibold">核心產品：</span>AI智慧刀把，整合高精度感測器與AI演算法。</li>
+                                <li><span class="font-semibold">關鍵技術：</span>以94.2%的準確率預測刀具剩餘使用壽命 (RUL)。</li>
+                                <li><span class="font-semibold">目標市場：</span>鎖定對精度要求極高的航太與半導體產業。</li>
+                            </ul>
+                        </div>
+                        <div class="p-6 bg-slate-100 rounded-lg text-center">
+                            <img src="https://placehold.co/400x250/E2E8F0/475569?text=AI+Smart+Tool+Holder" alt="AI智慧刀把示意圖" class="rounded-md mx-auto shadow-md" />
+                            <p class="mt-4 text-sm font-semibold text-slate-700">即時監控、預測性維護、自動停機</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: '挑戰：數據孤島的困境',
+                content: `
+                    <div class="text-center space-y-8">
+                        <p>當前的機隊運營模式，每台機台都像一座孤立的島嶼。</p>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="p-6 bg-amber-100 rounded-lg shadow">
+                                <h3 class="font-bold text-amber-800 text-xl mb-2">缺乏統一監控</h3>
+                                <p class="text-amber-700">無法即時掌握全廠設備的整體狀態與效率。</p>
+                            </div>
+                            <div class="p-6 bg-red-100 rounded-lg shadow">
+                                <h3 class="font-bold text-red-800 text-xl mb-2">被動式維護</h3>
+                                <p class="text-red-700">依賴經驗判斷或故障後維修，成本高昂且風險大。</p>
+                            </div>
+                            <div class="p-6 bg-gray-100 rounded-lg shadow">
+                                <h3 class="font-bold text-gray-800 text-xl mb-2">優化困難</h3>
+                                <p class="text-gray-700">無法進行跨機台的製程比較與資源最佳化調度。</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: '數據採集策略：我們要收集什麼？',
+                content: `
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="p-6 border-l-4 border-blue-500 bg-blue-50 rounded-r-lg">
+                            <h3 class="text-2xl font-bold text-blue-800 mb-3">沃龍核心指標 (高價值數據)</h3>
+                            <ul class="space-y-2 list-disc list-inside text-blue-700">
+                                <li>預測剩餘使用壽命 (RUL)</li>
+                                <li>即時刀具磨耗狀態</li>
+                                <li>原始振動/聲學訊號</li>
+                                <li>異常加工事件標記</li>
+                            </ul>
+                        </div>
+                        <div class="p-6 border-l-4 border-slate-500 bg-slate-50 rounded-r-lg">
+                            <h3 class="text-2xl font-bold text-slate-800 mb-3">CNC擴展指標 (情境關聯數據)</h3>
+                            <ul class="space-y-2 list-disc list-inside text-slate-700">
+                                <li>機台操作狀態 (運行/閒置/警報)</li>
+                                <li>主軸轉速與負載</li>
+                                <li>各軸負載與進給速率</li>
+                                <li>警報號碼與訊息</li>
+                                <li>能源消耗</li>
+                            </ul>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: '數據融合的價值：數位孿生',
+                content: `
+                    <div class="text-center">
+                        <p class="mb-8">單一數據點價值有限，真正的智慧來自於數據融合。</p>
+                        <div class="flex justify-center items-center space-x-4 text-2xl font-semibold">
+                            <div class="p-4 bg-blue-100 rounded-lg">刀具振動數據</div>
+                            <div class="text-blue-500">+</div>
+                            <div class="p-4 bg-slate-100 rounded-lg">主軸負載數據</div>
+                            <div class="text-blue-500">=</div>
+                            <div class="p-4 bg-green-100 rounded-lg text-green-800">高保真度的數位孿生</div>
+                        </div>
+                        <p class="mt-8">我們建立的不僅是監控系統，而是一個能反映真實加工場景的<strong class="font-bold text-gray-800">數位鏡像</strong>，實現從「被動監控」到「主動模擬與優化」的跨越。</p>
+                    </div>
+                `
+            },
+            {
+                title: 'IIoT架構：硬體與無線通訊',
+                content: `
+                    <div class="space-y-6">
+                        <h3 class="text-2xl font-bold text-center">雙層無線網路策略</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="p-6 bg-blue-100 rounded-lg text-center shadow-md">
+                                <h4 class="text-xl font-bold text-blue-800">主要骨幹：私有5G</h4>
+                                <p class="mt-2 text-blue-700">提供高可靠、低延遲、高安全的關鍵數據傳輸，與中華電信5G加速器合作基礎相契合。</p>
+                            </div>
+                            <div class="p-6 bg-teal-100 rounded-lg text-center shadow-md">
+                                <h4 class="text-xl font-bold text-teal-800">輔助網路：LoRaWAN</h4>
+                                <p class="mt-2 text-teal-700">低成本、低功耗連接溫濕度、液位等輔助感測器，豐富數據維度。</p>
+                            </div>
+                        </div>
+                        <div class="p-6 bg-slate-100 rounded-lg shadow-md">
+                            <h4 class="text-xl font-bold text-slate-800 text-center">機邊硬體：工業級邊緣閘道</h4>
+                            <p class="mt-2 text-slate-700 text-center">在每台機台旁部署強固型工業電腦 (IPC)，負責即時數據預處理、AI模型推論、協議轉換與數據緩存。</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: 'IIoT架構：軟體與通訊協議',
+                content: `
+                    <div class="text-center">
+                        <p class="text-2xl font-semibold mb-8">標準化數據流：從機台到平台</p>
+                        <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4">
+                            <div class="p-4 rounded-lg bg-gray-200 w-full md:w-auto text-center">
+                                <h4 class="font-bold">FANUC / Siemens</h4>
+                                <p class="text-sm">原生API (FOCAS/SDK)</p>
+                            </div>
+                            <div class="w-8 h-8 text-gray-500 hidden md:flex items-center justify-center">&rarr;</div>
+                            <div class="p-4 rounded-lg bg-blue-200 w-full md:w-auto text-center">
+                                <h4 class="font-bold">MTConnect 適配器</h4>
+                                <p class="text-sm">統一數據格式</p>
+                            </div>
+                            <div class="w-8 h-8 text-gray-500 hidden md:flex items-center justify-center">&rarr;</div>
+                            <div class="p-4 rounded-lg bg-teal-200 w-full md:w-auto text-center">
+                                <h4 class="font-bold">MQTT / 5G</h4>
+                                <p class="text-sm">安全可靠傳輸</p>
+                            </div>
+                            <div class="w-8 h-8 text-gray-500 hidden md:flex items-center justify-center">&rarr;</div>
+                            <div class="p-4 rounded-lg bg-green-200 w-full md:w-auto text-center">
+                                <h4 class="font-bold">中央數據平台</h4>
+                                <p class="text-sm">儲存、分析、視覺化</p>
+                            </div>
+                        </div>
+                        <p class="mt-8">此架構實現了中央平台與特定機台型號的<strong class="font-bold text-gray-800">解耦</strong>，是實現大規模、異構機隊管理的關鍵。</p>
+                    </div>
+                `
+            },
+            {
+                title: '可量化的商業價值',
+                content: `
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="flex items-start space-x-4 p-4">
+                            <div class="w-12 h-12 text-blue-500 flex-shrink-0 mt-1">${icons.zap}</div>
+                            <div>
+                                <h3 class="text-xl font-bold">預測性維護</h3>
+                                <p>大幅減少非計畫性停機，避免災難性故障。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4 p-4">
+                            <div class="w-12 h-12 text-green-500 flex-shrink-0 mt-1">${icons.target}</div>
+                            <div>
+                                <h3 class="text-xl font-bold">製程與品質優化</h3>
+                                <p>透過「黃金運行曲線」比對，降低廢品率。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4 p-4">
+                            <div class="w-12 h-12 text-amber-500 flex-shrink-0 mt-1">${icons.trendingUp}</div>
+                            <div>
+                                <h3 class="text-xl font-bold">OEE 提升</h3>
+                                <p>即時計算稼動率、性能、品質，定位生產瓶頸。</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4 p-4">
+                            <div class="w-12 h-12 text-teal-500 flex-shrink-0 mt-1">${icons.settings}</div>
+                            <div>
+                                <h3 class="text-xl font-bold">能源效率</h3>
+                                <p>識別能源浪費環節，降低營運成本，貢獻ESG目標。</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: '中央數據平台架構建議',
+                content: `
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="p-6 bg-slate-100 rounded-lg">
+                            <div class="w-16 h-16 text-slate-600 mx-auto mb-4">${icons.database}</div>
+                            <h3 class="text-2xl font-bold text-slate-800 text-center mb-3">後端 (Backend)</h3>
+                            <p class="text-center font-semibold text-xl text-blue-600">InfluxDB</p>
+                            <p class="text-center text-slate-600 mt-2">業界領先的開源<strong class="font-bold text-slate-700">時間序列資料庫</strong>，專為高吞吐量的工業數據寫入與即時查詢而設計。</p>
+                        </div>
+                        <div class="p-6 bg-slate-100 rounded-lg">
+                            <div class="w-16 h-16 text-slate-600 mx-auto mb-4">${icons.barChart}</div>
+                            <h3 class="text-2xl font-bold text-slate-800 text-center mb-3">前端 (Frontend)</h3>
+                            <p class="text-center font-semibold text-xl text-orange-500">Grafana</p>
+                            <p class="text-center text-slate-600 mt-2">專為時間序列數據設計的開源<strong class="font-bold text-slate-700">視覺化儀表板</strong>，可高度客製化，完美整合InfluxDB。</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: '三階段實施路徑圖',
+                content: `
+                    <div class="relative">
+                        <div class="border-l-2 border-blue-300 absolute h-full top-0 left-4"></div>
+                        <div class="space-y-8">
+                            <div class="pl-12 relative">
+                                <div class="absolute top-1 left-0 bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">1</div>
+                                <h3 class="text-xl font-bold text-blue-700">第一階段：先導部署與驗證 (3個月)</h3>
+                                <p>選擇2-5台代表性機台，驗證端到端數據通路，建立PoC儀表板。</p>
+                            </div>
+                            <div class="pl-12 relative">
+                                <div class="absolute top-1 left-0 bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">2</div>
+                                <h3 class="text-xl font-bold text-blue-700">第二階段：規模化推廣 (3-12個月)</h3>
+                                <p>設計標準化「IIoT連接套件」，分批次將方案推廣至客戶所有機台。</p>
+                            </div>
+                            <div class="pl-12 relative">
+                                <div class="absolute top-1 left-0 bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">3</div>
+                                <h3 class="text-xl font-bold text-blue-700">第三階段：進階分析與整合 (持續進行)</h3>
+                                <p>開發複雜AI模型，與MES/ERP系統整合，將數據價值最大化。</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: '戰略轉型：創造新商業模式',
+                content: `
+                    <div class="text-center">
+                        <p class="text-2xl font-semibold mb-8">此專案將驅動沃龍的商業模式根本性轉型</p>
+                        <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-8">
+                            <div class="p-6 rounded-lg bg-gray-100 w-full md:w-1/3">
+                                <h4 class="font-bold text-xl">從「賣刀把」</h4>
+                                <p class="text-sm">一次性硬體銷售</p>
+                            </div>
+                            <div class="text-3xl font-bold text-blue-500">&rarr;</div>
+                            <div class="p-6 rounded-lg bg-green-100 w-full md:w-1/3">
+                                <h4 class="font-bold text-xl text-green-800">到「賣成果」</h4>
+                                <p class="text-sm text-green-700">OEE提升保證、成本降低服務</p>
+                            </div>
+                        </div>
+                        <p class="mt-8">透過提供基於SaaS的訂閱制服務，建立<strong class="font-bold text-green-700">經常性收入流 (Recurring Revenue)</strong>，並以數據和演算法構建難以超越的<strong class="font-bold text-gray-800">護城河</strong>。</p>
+                    </div>
+                `
+            },
+            {
+                title: 'Q&A',
+                content: `
+                    <div class="text-center">
+                        <h2 class="text-6xl font-bold text-gray-800">感謝聆聽</h2>
+                        <p class="text-3xl text-gray-600 mt-4">問答環節</p>
+                    </div>
+                `
+            }
+        ];
 
-  const goToPrevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides)
-  }
-
-  // Add keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === 'ArrowRight') {
-        goToNextSlide()
-      } else if (event.key === 'ArrowLeft') {
-        goToPrevSlide()
-      }
-    }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [])
-
-
-  return (
-    <div className="bg-slate-200 font-sans flex items-center justify-center min-h-screen p-4">
-      <div className="w-full max-w-6xl aspect-video relative">
-        <div className="w-full h-full">
-         <Slide 
-            title={slides[currentSlide].title} 
-            content={slides[currentSlide].content} 
-            slideNumber={currentSlide + 1}
-            totalSlides={totalSlides}
-          />
-        </div>
+        // --- Presentation Logic ---
         
-        {/* Navigation Buttons */}
-        <button 
-          onClick={goToPrevSlide}
-          className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-12 bg-white/50 hover:bg-white rounded-full p-2 transition-all duration-300 shadow-md"
-          aria-label="上一張投影片"
-        >
-          <Icon name="chevronLeft" className="w-6 h-6 text-gray-700" />
-        </button>
-        <button 
-          onClick={goToNextSlide}
-          className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-12 bg-white/50 hover:bg-white rounded-full p-2 transition-all duration-300 shadow-md"
-          aria-label="下一張投影片"
-        >
-           <Icon name="chevronRight" className="w-6 h-6 text-gray-700" />
-        </button>
-      </div>
-    </div>
-  )
-}
+        let currentSlide = 0;
+        const totalSlides = slides.length;
+        const slideContainer = document.getElementById('slide-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        function renderSlide(slideIndex) {
+            const slide = slides[slideIndex];
+            const slideHTML = `
+                <div class="w-full h-full bg-white rounded-lg shadow-xl flex flex-col p-8 md:p-12 animate-fadeIn">
+                    <div class="flex-grow flex flex-col justify-center">
+                        <h1 class="text-3xl md:text-5xl font-bold text-gray-800 mb-6 text-center">${slide.title}</h1>
+                        <div class="text-lg md:text-xl text-gray-600 space-y-4 leading-relaxed">
+                            ${slide.content}
+                        </div>
+                    </div>
+                    <div class="text-right text-sm text-gray-400 mt-4">
+                        ${slideIndex + 1} / ${totalSlides}
+                    </div>
+                </div>
+            `;
+            slideContainer.innerHTML = slideHTML;
+        }
+
+        function goToNextSlide() {
+            currentSlide = (currentSlide + 1) % totalSlides;
+            renderSlide(currentSlide);
+        }
+
+        function goToPrevSlide() {
+            currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+            renderSlide(currentSlide);
+        }
+
+        // Event Listeners
+        nextBtn.addEventListener('click', goToNextSlide);
+        prevBtn.addEventListener('click', goToPrevSlide);
+
+        window.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight') {
+                goToNextSlide();
+            } else if (event.key === 'ArrowLeft') {
+                goToPrevSlide();
+            }
+        });
+
+        // Initial render
+        window.onload = function() {
+            renderSlide(currentSlide);
+        };
+
+    </script>
+</body>
+</html>
