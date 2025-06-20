@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>沃龍工業智慧刀把大規模部署策略簡報</title>
+    
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 引入 Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* 自定義樣式 */
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #f8fafc; /* Slate 50 */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        .slide {
+            /* 幻燈片基本樣式 */
+            width: 90vw;
+            height: 80vh;
+            max-width: 1200px;
+            max-height: 700px;
+            background-color: #1e293b; /* Slate 800 */
+            border-radius: 1.5rem; /* 24px */
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            padding: 2.5rem 4rem; /* 40px 64px */
+            display: none; /* 預設隱藏 */
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.5s ease-in-out;
+            opacity: 0;
+            transform: scale(0.95);
+            position: absolute;
+        }
+        .slide.active {
+            /* 當前幻燈片樣式 */
+            display: flex;
+            opacity: 1;
+            transform: scale(1);
+        }
+        /* 導航按鈕樣式 */
+        .nav-button {
+            position: fixed;
+            bottom: 5vh;
+            background-color: #334155; /* Slate 700 */
+            color: #e2e8f0; /* Slate 200 */
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            user-select: none;
+        }
+        .nav-button:hover {
+            background-color: #475569; /* Slate 600 */
+        }
+        #prevBtn {
+            left: 5vw;
+        }
+        #nextBtn {
+            right: 5vw;
+        }
+        #slideCounter {
+            position: fixed;
+            bottom: 5vh;
+            color: #94a3b8; /* Slate 400 */
+            font-size: 1rem;
+        }
+        /* 幻燈片內容樣式 */
+        .slide-title {
+            font-size: 2.25rem; /* 36px */
+            font-weight: 700;
+            color: #e2e8f0; /* Slate 200 */
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .slide-subtitle {
+            font-size: 1.25rem; /* 20px */
+            color: #94a3b8; /* Slate 400 */
+            margin-bottom: 2.5rem; /* 40px */
+            text-align: center;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem; /* 40px */
+            width: 100%;
+            align-items: center;
+        }
+        .text-content ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            color: #cbd5e1; /* Slate 300 */
+        }
+        .text-content li {
+            margin-bottom: 1rem;
+            font-size: 1.125rem; /* 18px */
+        }
+        .text-content p {
+             margin-bottom: 1rem;
+             font-size: 1.125rem; /* 18px */
+             color: #cbd5e1; /* Slate 300 */
+        }
+        .highlight {
+            color: #7dd3fc; /* Sky 400 */
+            font-weight: 700;
+        }
+        .image-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 1rem;
+            background-color: #334155;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 幻燈片容器 -->
+    <main id="presentation-container">
+
+        <!-- 幻燈片 1: 封面頁 -->
+        <div class="slide active">
+            <div class="flex flex-col items-center justify-center text-center">
+                <div class="text-2xl font-bold text-sky-400 mb-4">沃龍工業｜智慧製造轉型專案</div>
+                <h1 class="text-6xl font-extrabold text-slate-100 mb-6 leading-tight">智慧刀把大規模部署</h1>
+                <p class="text-3xl text-slate-300">聯網、監控與最佳化策略</p>
+            </div>
+        </div>
+
+        <!-- 幻燈片 2: 專案願景與挑戰 -->
+        <div class="slide">
+            <h2 class="slide-title">願景與挑戰</h2>
+            <p class="slide-subtitle">從數據孤島，邁向統一監控平台</p>
+            <div class="content-grid">
+                <div class="text-content bg-slate-700/50 p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-4 text-red-400">當前挑戰：數據孤島</h3>
+                    <ul>
+                        <li>每台CNC加工機獨立運作，數據未能有效利用。</li>
+                        <li>被動式維護導致非預期停機，成本高昂。</li>
+                        <li>缺乏即時生產可視性，難以精準調度資源。</li>
+                    </ul>
+                </div>
+                <div class="text-content bg-slate-700/50 p-6 rounded-lg">
+                    <h3 class="text-2xl font-bold mb-4 text-green-400">我們的願景：主動預測</h3>
+                    <ul>
+                        <li>建立全面聯網環境，實現統一管理與遠端監控。</li>
+                        <li>導入預測性維護，在刀具失效前主動介入。</li>
+                        <li>透過數據驅動決策，持續優化生產流程。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 幻燈片 3: 核心技術：沃龍「智慧刀把」 -->
+        <div class="slide">
+            <h2 class="slide-title">核心技術：沃龍「智慧刀把」</h2>
+            <p class="slide-subtitle">AI驅動的預測能力，源自中正大學的研發能量</p>
+            <div class="content-grid">
+                <div class="text-content">
+                    <ul>
+                        <li><span class="highlight">數據採集：</span>內嵌壓電感測器，即時擷取高頻切削數據。</li>
+                        <li><span class="highlight">AI分析：</span>AI模型精準預測刀具磨耗與剩餘壽命 (RUL)，準確率達 <span class="highlight">94.2%</span>。</li>
+                        <li><span class="highlight">可量化價值：</span>降低 <span class="highlight">30%</span> 刀具成本，提升 <span class="highlight">15%</span> 製程效能，並實現ESG永續目標。</li>
+                    </ul>
+                </div>
+                <img src="https://placehold.co/600x400/334155/e2e8f0?text=智慧刀把技術核心" alt="智慧刀把技術核心示意圖" class="image-placeholder"/>
+            </div>
+        </div>
+
+        <!-- 幻燈片 4: 關鍵指標採集 -->
+        <div class="slide">
+            <h2 class="slide-title">我們需要採集哪些關鍵指標？</h2>
+            <p class="slide-subtitle">融合機台與感測器數據，提供完整視圖</p>
+            <div class="content-grid">
+                <div class="text-content">
+                    <h3 class="text-xl font-bold mb-2">1. 機台層級指標 (OEE框架)</h3>
+                    <p>透過 <span class="highlight">FANUC FOCAS / Siemens OPC UA</span> 採集</p>
+                    <ul>
+                        <li>機台狀態 (運行/閒置/警報) ➞ <span class="highlight">可用率</span></li>
+                        <li>零件計數 & 程式名稱 ➞ <span class="highlight">性能</span></li>
+                        <li>警報代碼 & 主軸負載 ➞ <span class="highlight">根本原因分析</span></li>
+                    </ul>
+                </div>
+                <div class="text-content">
+                    <h3 class="text-xl font-bold mb-2">2. 智慧刀把感測器指標</h3>
+                    <p>來自沃龍AI模型的核心輸出</p>
+                    <ul>
+                        <li>預測剩餘刀具壽命 (RUL) ➞ <span class="highlight">預測性維護</span></li>
+                        <li>刀具磨耗狀態 ➞ <span class="highlight">視覺化刀具健康度</span></li>
+                        <li>即時異常分數 ➞ <span class="highlight">預警品質問題</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 幻燈片 5: 整體系統架構 -->
+        <div class="slide">
+             <h2 class="slide-title">整體系統架構</h2>
+             <p class="slide-subtitle">從邊緣到雲端，數據如何流動</p>
+             <img src="https://placehold.co/1000x500/1e293b/e2e8f0?text=CNC+%E2%9E%A1+%E9%82%8A%E7%B7%A3%E9%9B%98%E9%81%93%E5%99%A8+%E2%9E%A1+5G+%E2%9E%A1+%E4%B8%AD%E5%A4%AE%E5%84%80%E8%A1%A8%E6%9D%BF" alt="系統架構圖" class="w-full h-auto rounded-lg"/>
+             <div class="flex justify-around w-full mt-4 text-center">
+                 <div><h3 class="font-bold text-lg">1. 邊緣端</h3><p>數據採集、AI即時運算</p></div>
+                 <div><h3 class="font-bold text-lg">2. 無線傳輸</h3><p>企業專用5G網路</p></div>
+                 <div><h3 class="font-bold text-lg">3. 中央平台</h3><p>數據儲存、視覺化分析</p></div>
+             </div>
+        </div>
+        
+        <!-- 幻燈片 6: 邊緣端架構 -->
+        <div class="slide">
+            <h2 class="slide-title">邊緣端架構：機台上的智慧大腦</h2>
+            <p class="slide-subtitle">透過邊緣閘道器實現即時運算與數據標準化</p>
+            <div class="content-grid">
+                <div class="text-content">
+                    <h3 class="text-xl font-bold mb-2">關鍵組件</h3>
+                    <ul>
+                        <li><span class="highlight">智慧刀把 & DAQ：</span>高頻數據來源。</li>
+                        <li><span class="highlight">邊緣閘道器 (Edge Gateway)：</span>強固型工業電腦，為數據匯流中心。</li>
+                        <li><span class="highlight">5G通訊模組：</span>提供穩定可靠的無線上行。</li>
+                    </ul>
+                     <h3 class="text-xl font-bold mt-6 mb-2">核心功能</h3>
+                     <ul>
+                        <li>在本地端運行AI模型，避免海量原始數據上傳。</li>
+                        <li>將 FOCAS / OPC UA 專有協議轉換為統一格式 (MQTT)。</li>
+                        <li>網路中斷時緩存數據，確保資料不遺失。</li>
+                    </ul>
+                </div>
+                <img src="https://placehold.co/600x400/334155/e2e8f0?text=邊緣閘道器與其組件" alt="邊緣閘道器示意圖" class="image-placeholder"/>
+            </div>
+        </div>
+
+        <!-- 幻燈片 7: 無線通訊策略 -->
+        <div class="slide">
+            <h2 class="slide-title">無線通訊策略：為何選擇企業專用5G？</h2>
+            <p class="slide-subtitle">為任務關鍵型應用，打造穩定、可靠、安全的網路基礎</p>
+            <div class="w-full max-w-4xl">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-700">
+                            <th class="p-3">特性</th>
+                            <th class="p-3 text-sky-400">企業專用 5G</th>
+                            <th class="p-3">Wi-Fi 6 / 6E</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-slate-600">
+                            <td class="p-3">可靠性</td>
+                            <td class="p-3 text-green-400 font-bold">極高 (專用頻譜，不受干擾)</td>
+                            <td class="p-3 text-yellow-400">中等 (易受干擾)</td>
+                        </tr>
+                        <tr class="border-b border-slate-600">
+                            <td class="p-3">延遲性</td>
+                            <td class="p-3 text-green-400 font-bold">超低</td>
+                            <td class="p-3 text-yellow-400">較低</td>
+                        </tr>
+                        <tr class="border-b border-slate-600">
+                            <td class="p-3">擴展性</td>
+                            <td class="p-3 text-green-400 font-bold">極佳 (高密度設備環境)</td>
+                            <td class="p-3 text-red-400">有限</td>
+                        </tr>
+                        <tr class="border-b border-slate-600">
+                            <td class="p-3">安全性</td>
+                            <td class="p-3 text-green-400 font-bold">高 (可建立私有隔離網路)</td>
+                            <td class="p-3 text-yellow-400">中等</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="mt-6 text-center text-lg">結論：<span class="highlight">企業專用5G</span> 是工業級應用的首選，更能為未來智慧工廠應用奠定基礎。</p>
+            </div>
+        </div>
+
+        <!-- 幻燈片 8: 中央平台與儀表板 -->
+        <div class="slide">
+            <h2 class="slide-title">中央神經系統：數據聚合與儀表板</h2>
+            <p class="slide-subtitle">採用雙層儀表板架構，滿足不同使用者需求</p>
+            <div class="content-grid">
+                <div class="text-content">
+                    <h3 class="text-xl font-bold mb-2">營運儀表板 (For 現場人員)</h3>
+                    <p>使用 <span class="highlight">Grafana</span> 實現即時監控</p>
+                    <ul>
+                        <li>工廠總體OEE與即時機台狀態。</li>
+                        <li>智慧刀把RUL與異常分數即時警報。</li>
+                        <li>可下鑽至單機製程參數曲線。</li>
+                    </ul>
+                </div>
+                <div class="text-content">
+                    <h3 class="text-xl font-bold mb-2">分析儀表板 (For 管理層)</h3>
+                    <p>使用 <span class="highlight">Power BI / Tableau</span> 進行深度分析</p>
+                    <ul>
+                        <li>跨週/月的OEE趨勢分析。</li>
+                        <li>停機根本原因柏拉圖分析。</li>
+                        <li>成本節省與投資回報率 (ROI) 評估。</li>
+                    </ul>
+                </div>
+            </div>
+            <img src="https://placehold.co/1000x250/1e293b/e2e8f0?text=Grafana+OEE儀表板概念圖" alt="儀表板概念圖" class="w-full h-auto rounded-lg mt-6"/>
+        </div>
+        
+        <!-- 幻燈片 9: 預期效益 -->
+        <div class="slide">
+            <h2 class="slide-title">預期效益與最佳化成果</h2>
+            <p class="slide-subtitle">將技術投資轉化為可量化的商業價值</p>
+            <div class="grid grid-cols-2 grid-rows-2 gap-6 w-full">
+                <div class="bg-slate-700/50 p-4 rounded-lg">
+                    <h3 class="text-lg font-bold text-sky-300">實現預測性維護</h3>
+                    <p class="text-sm text-slate-300">最大化刀具壽命，大幅減少非計畫性停機，提升OEE可用率與品質率。</p>
+                </div>
+                <div class="bg-slate-700/50 p-4 rounded-lg">
+                    <h3 class="text-lg font-bold text-sky-300">強化生產排程</h3>
+                    <p class="text-sm text-slate-300">根據即時OEE數據動態調整計畫，提升整體產出與準時交貨率。</p>
+                </div>
+                <div class="bg-slate-700/50 p-4 rounded-lg">
+                    <h3 class="text-lg font-bold text-sky-300">改善品質控制</h3>
+                    <p class="text-sm text-slate-300">以數據驅動製程優化，找到品質變異的根本原因，減少廢品。</p>
+                </div>
+                <div class="bg-slate-700/50 p-4 rounded-lg">
+                    <h3 class="text-lg font-bold text-sky-300">符合ESG要求</h3>
+                    <p class="text-sm text-slate-300">識別並量化能源浪費，提供可量化的碳排減少數據，節省電費。</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 幻燈片 10: 實施藍圖 -->
+        <div class="slide">
+            <h2 class="slide-title">實施藍圖：分階段工作流程</h2>
+            <p class="slide-subtitle">採用務實、循序漸進的計畫，降低風險、確保成功</p>
+            <div class="w-full flex justify-between items-center relative">
+                <!-- Line -->
+                <div class="absolute top-1/2 left-0 w-full h-1 bg-slate-600 -translate-y-1/2"></div>
+                <!-- Stages -->
+                <div class="relative bg-slate-800 p-4 rounded-lg z-10 w-1/3 mx-2 text-center border-2 border-sky-500">
+                    <div class="text-xl font-bold mb-2">第一階段：PoC</div>
+                    <p class="text-sm">概念驗證 (1-2個月)</p>
+                    <p class="text-xs text-slate-400 mt-2">2台機台，驗證技術可行性</p>
+                </div>
+                <div class="relative bg-slate-800 p-4 rounded-lg z-10 w-1/3 mx-2">
+                    <div class="text-xl font-bold mb-2">第二階段：Pilot</div>
+                    <p class="text-sm">先導計畫 (2-3個月)</p>
+                    <p class="text-xs text-slate-400 mt-2">5-10台機台，測試效能與擴展性</p>
+                </div>
+                <div class="relative bg-slate-800 p-4 rounded-lg z-10 w-1/3 mx-2">
+                    <div class="text-xl font-bold mb-2">第三階段：Rollout</div>
+                    <p class="text-sm">全面推廣 (6-12個月+)</p>
+                    <p class="text-xs text-slate-400 mt-2">全廠部署，融入標準作業流程</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 幻燈片 11: Q&A -->
+        <div class="slide">
+            <div class="flex flex-col items-center justify-center text-center">
+                <h1 class="text-7xl font-extrabold text-slate-100 mb-8">Q & A</h1>
+                <p class="text-3xl text-slate-300">感謝聆聽，歡迎提問與討論</p>
+            </div>
+        </div>
+        
+    </main>
+
+    <!-- 導航控制 -->
+    <div id="navigation">
+        <button id="prevBtn" class="nav-button">上一頁</button>
+        <span id="slideCounter">1 / 11</span>
+        <button id="nextBtn" class="nav-button">下一頁</button>
+    </div>
+
+    <script>
+        // JavaScript 用於幻燈片控制
+        document.addEventListener('DOMContentLoaded', () => {
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const slideCounter = document.getElementById('slideCounter');
+            let currentSlide = 0;
+
+            function showSlide(index) {
+                // 隱藏所有幻燈片
+                slides.forEach((slide, i) => {
+                    slide.classList.remove('active');
+                });
+                
+                // 顯示目標幻燈片
+                if (slides[index]) {
+                    slides[index].classList.add('active');
+                }
+                
+                // 更新計數器
+                slideCounter.textContent = `${index + 1} / ${slides.length}`;
+                
+                // 更新按鈕可見性
+                prevBtn.style.visibility = index === 0 ? 'hidden' : 'visible';
+                nextBtn.style.visibility = index === slides.length - 1 ? 'hidden' : 'visible';
+            }
+
+            function nextSlide() {
+                if (currentSlide < slides.length - 1) {
+                    currentSlide++;
+                    showSlide(currentSlide);
+                }
+            }
+
+            function prevSlide() {
+                if (currentSlide > 0) {
+                    currentSlide--;
+                    showSlide(currentSlide);
+                }
+            }
+
+            // 事件監聽器
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            // 鍵盤控制
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowRight' || e.key === ' ') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+
+            // 初始顯示第一張幻燈片
+            showSlide(currentSlide);
+        });
+    </script>
+</body>
+</html>
