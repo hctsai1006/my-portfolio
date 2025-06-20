@@ -18,6 +18,25 @@
         .animate-fadeIn {
             animation: fadeIn 0.5s ease-in-out;
         }
+        /* 新增的SVG動畫 */
+        @keyframes pulse-glow {
+            0%, 100% {
+                filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.4));
+            }
+            50% {
+                filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.8));
+            }
+        }
+        .animate-pulse-glow {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+        @keyframes-stagger-in {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .stagger-in {
+            animation: keyframes-stagger-in 0.5s ease-out forwards;
+        }
     </style>
 </head>
 <body class="bg-slate-200 flex items-center justify-center min-h-screen p-4">
@@ -75,18 +94,50 @@
             {
                 title: '關於沃龍工業：深度科技驅動',
                 content: `
-                    <div class="grid md:grid-cols-2 gap-8 items-center">
-                        <div>
-                            <ul class="space-y-4 list-disc list-inside">
-                                <li><span class="font-semibold">學術淵源：</span>源自中正大學的學生創業團隊，具備深厚的研發實力。</li>
-                                <li><span class="font-semibold">核心產品：</span>AI智慧刀把，整合高精度感測器與AI演算法。</li>
-                                <li><span class="font-semibold">關鍵技術：</span>以94.2%的準確率預測刀具剩餘使用壽命 (RUL)。</li>
-                                <li><span class="font-semibold">目標市場：</span>鎖定對精度要求極高的航太與半導體產業。</li>
-                            </ul>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center h-full">
+                        <div class="space-y-4">
+                             <div class="stagger-in" style="animation-delay: 100ms;">
+                                <h4 class="font-bold text-lg text-blue-600">學術淵源</h4>
+                                <p class="text-gray-600">源自中正大學的學生創業團隊，具備深厚的研發實力。</p>
+                            </div>
+                             <div class="stagger-in" style="animation-delay: 200ms;">
+                                <h4 class="font-bold text-lg text-blue-600">核心產品</h4>
+                                <p class="text-gray-600">AI智慧刀把，整合高精度感測器與AI演算法。</p>
+                            </div>
+                             <div class="stagger-in" style="animation-delay: 300ms;">
+                                <h4 class="font-bold text-lg text-blue-600">關鍵技術</h4>
+                                <p class="text-gray-600">以94.2%的準確率預測刀具剩餘使用壽命 (RUL)。</p>
+                            </div>
+                             <div class="stagger-in" style="animation-delay: 400ms;">
+                                <h4 class="font-bold text-lg text-blue-600">目標市場</h4>
+                                <p class="text-gray-600">鎖定對精度要求極高的航太與半導體產業。</p>
+                            </div>
                         </div>
-                        <div class="p-6 bg-slate-100 rounded-lg text-center">
-                            <img src="https://placehold.co/400x250/E2E8F0/475569?text=AI+Smart+Tool+Holder" alt="AI智慧刀把示意圖" class="rounded-md mx-auto shadow-md" />
-                            <p class="mt-4 text-sm font-semibold text-slate-700">即時監控、預測性維護、自動停機</p>
+                        <div class="relative flex items-center justify-center h-full">
+                            <div class="absolute inset-0 bg-slate-800 rounded-2xl transform -rotate-3"></div>
+                            <div class="relative w-full h-4/5 bg-slate-900 rounded-lg shadow-2xl flex flex-col items-center justify-center p-6 text-white overflow-hidden">
+                                 <div class="w-48 h-48 animate-pulse-glow">
+                                    <svg viewBox="0 0 100 100" class="w-full h-full">
+                                        <!-- Tool Holder Body -->
+                                        <defs>
+                                            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" style="stop-color:rgb(30,58,138);stop-opacity:1" />
+                                                <stop offset="100%" style="stop-color:rgb(37,99,235);stop-opacity:1" />
+                                            </linearGradient>
+                                        </defs>
+                                        <path d="M40,90 L40,40 Q40,35 45,35 L55,35 Q60,35 60,40 L60,90 Z" fill="url(#grad1)"/>
+                                        <rect x="35" y="30" width="30" height="5" rx="2" fill="rgb(37, 99, 235)"/>
+                                        <rect x="30" y="20" width="40" height="10" rx="3" fill="rgb(37, 99, 235)"/>
+                                        <!-- Data Streams -->
+                                        <path d="M 30 25 C 20 35, 20 65, 30 75" stroke="rgba(59, 130, 246, 0.7)" fill="none" stroke-width="1.5" stroke-dasharray="3 3"/>
+                                        <path d="M 70 25 C 80 35, 80 65, 70 75" stroke="rgba(59, 130, 246, 0.7)" fill="none" stroke-width="1.5" stroke-dasharray="3 3"/>
+                                        <circle cx="28" cy="78" r="2" fill="rgba(96, 165, 250, 1)"/>
+                                        <circle cx="72" cy="78" r="2" fill="rgba(96, 165, 250, 1)"/>
+                                    </svg>
+                                 </div>
+                                <h3 class="mt-4 text-2xl font-bold tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-200">AI SMART TOOL</h3>
+                                <p class="text-sm text-blue-300">即時監控・預測性維護・自動停機</p>
+                            </div>
                         </div>
                     </div>
                 `
